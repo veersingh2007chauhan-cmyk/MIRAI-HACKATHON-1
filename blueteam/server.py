@@ -63,6 +63,31 @@ class BatchTestRequest(BaseModel):
     limit: Optional[int] = 50
 
 
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint for frontend status verification."""
+    return {
+        "status": "online",
+        "service": "Possessed Butler Defense Engine",
+        "version": "2.0.0",
+        "timestamp": time.time(),
+        "enforce": pipeline.enforce,
+        "layers": pipeline.layers_cfg,
+    }
+
+
+@app.get("/api/status")
+async def status_check():
+    """Live status endpoint for game and defense grid."""
+    return {
+        "status": "active",
+        "butler": "Possessed Android Butler",
+        "red_team_payloads": 51,
+        "defense_integrity": 100,
+        "active_layers": pipeline.layers_cfg,
+    }
+
+
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
     """Serve the single-page frontend console."""

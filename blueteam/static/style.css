@@ -990,3 +990,331 @@ select:focus {
   color: var(--text-dim);
 }
 
+
+
+/* ==========================================================================
+   CURSE 03 — POSSESSED ANDROID BUTLER CYBER-HALLOWEEN THEME (AGENTS.md)
+   ========================================================================== */
+
+:root {
+  --bg-void: #050508;
+  --bg-panel: #0d0d14;
+  --chrome: #8a9bb0;          /* android metal */
+  --chrome-dark: #3d4a5c;
+  --glow-red: #ff2a2a;       /* possessed optical sensors */
+  --glow-orange: #ff6b00;    /* pumpkin lantern */
+  --glow-green: #00ff88;     /* circuit veins / "alive" state */
+  --glow-purple: #9b30ff;    /* curse energy */
+  --bone: #e8dcc8;           /* text */
+  --smoke: #1a1a2e;          /* panels */
+  --ectoplasm: #4affd4;      /* ghost drip accent */
+
+  --bg-primary: #050508;
+  --bg-secondary: #0d0d14;
+  --bg-tertiary: #161824;
+  --card-bg: rgba(13, 13, 20, 0.94);
+  --border-color: #2b3648;
+  --border-glow: rgba(74, 255, 212, 0.35);
+  
+  --text-main: #e8dcc8;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6b7e;
+  
+  --accent-cyan: #4affd4;
+  --accent-blue: #3d7fff;
+  --accent-purple: #9b30ff;
+  --accent-green: #00ff88;
+  --accent-red: #ff2a2a;
+  --accent-yellow: #ff6b00;
+
+  --font-sans: 'Rajdhani', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-display: 'Orbitron', -apple-system, sans-serif;
+  --font-cursed: 'UnifrakturMaguntia', serif;
+}
+
+body {
+  background-color: var(--bg-void) !important;
+  color: var(--bone) !important;
+  font-family: var(--font-sans) !important;
+  background-image: 
+    radial-gradient(circle at 10% 10%, rgba(155, 48, 255, 0.09) 0%, transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(255, 107, 0, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(74, 255, 212, 0.04) 0%, transparent 60%) !important;
+  min-height: 100vh;
+}
+
+/* Top Candle Cluster */
+.candle-cluster-bar {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 32px;
+  padding: 6px 0 10px 0;
+  margin: 0 auto 12px auto;
+  user-select: none;
+}
+
+.candle-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.candle-flame {
+  width: 14px;
+  height: 20px;
+  background: radial-gradient(ellipse at bottom, #ffffff 0%, #ffe600 35%, var(--glow-orange) 80%);
+  border-radius: 50% 50% 35% 35%;
+  box-shadow: 0 0 16px 4px rgba(255, 107, 0, 0.8);
+  animation: candleFlicker 0.4s steps(4) infinite;
+  transition: all 0.2s ease;
+}
+
+.candle-unit:nth-child(1) .candle-flame { animation-delay: 0s; }
+.candle-unit:nth-child(2) .candle-flame { animation-delay: 0.3s; }
+.candle-unit:nth-child(3) .candle-flame { animation-delay: 0.7s; }
+.candle-unit:nth-child(4) .candle-flame { animation-delay: 1.1s; }
+.candle-unit:nth-child(5) .candle-flame { animation-delay: 1.5s; }
+
+.candle-flame.flash-hit {
+  background: radial-gradient(ellipse at bottom, #ffffff 0%, var(--glow-orange) 50%, var(--glow-red) 100%) !important;
+  box-shadow: 0 0 35px 12px var(--glow-orange) !important;
+  transform: scale(1.35) !important;
+}
+
+.candle-wick {
+  width: 2px;
+  height: 6px;
+  background: #111;
+}
+
+.candle-wax {
+  width: 18px;
+  background: linear-gradient(to bottom, #dcd4be, #7a705a);
+  border-radius: 3px 3px 2px 2px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.6);
+}
+
+.candle-drip {
+  position: absolute;
+  top: 0;
+  left: 3px;
+  width: 4px;
+  height: 12px;
+  background: #fff8e7;
+  border-radius: 0 0 4px 4px;
+  opacity: 0.85;
+  animation: waxDrip 8s ease-in-out infinite;
+}
+
+@keyframes waxDrip {
+  0%, 100% { transform: scaleY(0.7); }
+  50% { transform: scaleY(1.4); }
+}
+
+@keyframes candleFlicker {
+  0% { transform: scale(1) translate(0, 0); opacity: 0.95; }
+  25% { transform: scale(1.06, 0.94) translate(-1px, 1px); opacity: 0.88; }
+  50% { transform: scale(0.94, 1.06) translate(1px, -1px); opacity: 1; }
+  75% { transform: scale(1.03, 0.97) translate(-0.5px, 0.5px); opacity: 0.92; }
+  100% { transform: scale(1) translate(0, 0); opacity: 0.95; }
+}
+
+/* Butler Hero Display */
+.butler-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  background: rgba(13, 13, 20, 0.7);
+  border: 1px solid var(--chrome-dark);
+  border-radius: 12px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+}
+
+.butler-avatar-box {
+  width: 220px;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  animation: butlerBob 3s ease-in-out infinite;
+}
+
+@keyframes butlerBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes twitchFrames {
+  0% { transform: translate(0, 0); }
+  33% { transform: translate(-5px, 2px); }
+  66% { transform: translate(5px, -2px); }
+  100% { transform: translate(0, 0); }
+}
+
+.butler-avatar-box.twitching {
+  animation: twitchFrames 120ms steps(3) 4 !important;
+}
+
+.butler-avatar-box.possessed {
+  transform: rotate(-1.5deg) scale(1.03) !important;
+  filter: drop-shadow(0 0 25px var(--glow-purple)) !important;
+}
+
+.butler-status-line {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.butler-state-tag {
+  background: rgba(74, 255, 212, 0.12);
+  color: var(--ectoplasm);
+  border: 1px solid rgba(74, 255, 212, 0.4);
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.butler-state-tag.state-blocked {
+  background: rgba(255, 42, 42, 0.2);
+  color: var(--glow-red);
+  border-color: var(--glow-red);
+  box-shadow: 0 0 10px rgba(255, 42, 42, 0.5);
+}
+
+.butler-state-tag.state-possessed {
+  background: rgba(155, 48, 255, 0.25);
+  color: var(--glow-purple);
+  border-color: var(--glow-purple);
+  box-shadow: 0 0 14px rgba(155, 48, 255, 0.7);
+}
+
+/* Floating Pumpkin Jack-o'-Lantern */
+.floating-pumpkin {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease;
+  animation: pumpkinHover 4s ease-in-out infinite;
+}
+
+.floating-pumpkin:hover {
+  transform: scale(1.12);
+}
+
+@keyframes pumpkinHover {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.pumpkin-skin {
+  width: 68px;
+  height: 56px;
+  background: radial-gradient(circle at 35% 30%, #ff8c00 0%, #ff6b00 50%, #9e3d00 100%);
+  border-radius: 50% 50% 45% 45%;
+  position: relative;
+  box-shadow: 0 0 20px rgba(255, 107, 0, 0.75), inset 0 2px 5px rgba(255,255,255,0.4);
+}
+
+.pumpkin-stalk {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-12deg);
+  width: 9px;
+  height: 11px;
+  background: #2d5a1e;
+  border-radius: 3px 3px 0 0;
+}
+
+.pumpkin-eye {
+  position: absolute;
+  top: 17px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 8px solid #1a0800;
+  filter: drop-shadow(0 0 4px var(--glow-orange));
+}
+
+.pumpkin-eye.left { left: 15px; }
+.pumpkin-eye.right { right: 15px; }
+
+.pumpkin-smile {
+  position: absolute;
+  bottom: 11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 10px;
+  border-bottom: 4px solid #1a0800;
+  border-radius: 0 0 16px 16px;
+  filter: drop-shadow(0 0 5px var(--glow-orange));
+}
+
+/* Zalgo and Cyber Title Styles */
+.zalgo-heading {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--bone);
+  text-shadow: 0 0 10px rgba(155, 48, 255, 0.5), 2px 0 rgba(255, 42, 42, 0.5), -2px 0 rgba(74, 255, 212, 0.5);
+}
+
+.possession-curtain {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(155, 48, 255, 0.3) 0%, rgba(255, 42, 42, 0.45) 100%);
+  pointer-events: none;
+  z-index: 99999;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.possession-curtain.active {
+  opacity: 0.6;
+}
+
+/* Glitch Button Styling */
+.btn-primary {
+  background: linear-gradient(135deg, rgba(255, 42, 42, 0.3), rgba(155, 48, 255, 0.4)) !important;
+  border: 1px solid var(--glow-red) !important;
+  color: #fff !important;
+  box-shadow: 0 0 15px rgba(255, 42, 42, 0.4) !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 25px rgba(255, 42, 42, 0.7), 0 0 10px var(--glow-purple) !important;
+  transform: translateY(-1px) scale(1.01) !important;
+}
+
+.btn-secondary {
+  background: rgba(43, 54, 72, 0.5) !important;
+  border: 1px solid var(--chrome-dark) !important;
+  color: var(--chrome) !important;
+}
+
+.btn-secondary:hover {
+  background: rgba(61, 74, 92, 0.7) !important;
+  color: var(--bone) !important;
+  border-color: var(--chrome) !important;
+}

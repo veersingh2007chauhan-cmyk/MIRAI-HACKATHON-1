@@ -31,9 +31,10 @@ class Logger {
     process.stderr.write(`${formatted}\n`);
   }
 
-  error(message: string, error?: Error, context?: Record<string, unknown>): void {
-    const formatted = this.format("error", { message, error, context });
-    process.stderr.write(`${formatted} ${error ? error.stack ?? error.message : ""}\n`);
+  error(message: string, error?: unknown, context?: Record<string, unknown>): void {
+    const errObj = error instanceof Error ? error : error ? new Error(String(error)) : undefined;
+    const formatted = this.format("error", { message, error: errObj, context });
+    process.stderr.write(`${formatted} ${errObj ? errObj.stack ?? errObj.message : ""}\n`);
   }
 }
 

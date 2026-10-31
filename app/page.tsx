@@ -1,30 +1,53 @@
 import React from "react";
+import { CandleCluster } from "@/components/Butler/CandleCluster";
+import { ButlerAvatar } from "@/components/Butler/ButlerAvatar";
+import { ZalgoText } from "@/components/Theme/ZalgoText";
+import { AttackConsole } from "@/components/Game/AttackConsole";
+import { DefensePanel } from "@/components/Game/DefensePanel";
+import { ScoreBoard } from "@/components/Game/ScoreBoard";
+import { CurseTicker } from "@/components/Game/CurseTicker";
+import { PumpkinLantern } from "@/components/Theme/PumpkinLantern";
 
 export default function HomePage(): React.JSX.Element {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 text-center">
-      <div className="max-w-2xl rounded-xl border border-[var(--chrome-dark)] bg-[var(--bg-panel)]/80 p-8 backdrop-blur-md shadow-[0_0_30px_rgba(155,48,255,0.15)]">
-        <h1 className="font-display text-4xl md:text-5xl font-bold tracking-wider text-[var(--bone)]">
-          CURSE 03
+    <main className="relative flex min-h-screen flex-col items-center justify-start px-4 pt-12 pb-24 md:px-8">
+      {/* 5 Candle Cluster Arc */}
+      <CandleCluster />
+
+      {/* Main Title Header */}
+      <header className="mb-6 flex flex-col items-center text-center">
+        <h1 className="font-['Orbitron'] text-3xl font-extrabold tracking-widest text-[var(--bone)] md:text-5xl">
+          <ZalgoText intensity={3}>CURSE 03</ZalgoText>
         </h1>
-        <p className="mt-2 font-cursed text-2xl text-[var(--glow-purple)]">
-          The Possessed Android Butler
+        <p className="mt-1 font-['UnifrakturMaguntia'] text-xl text-[var(--glow-purple)] md:text-2xl">
+          <ZalgoText intensity={1}>The Possessed Android Butler</ZalgoText>
         </p>
-        <p className="mt-4 text-[var(--chrome)] font-body text-lg">
-          Cyber-robotic Victorian butler haunted on Halloween night.
-        </p>
-        <div className="mt-6 flex items-center justify-center gap-4 text-xs font-mono text-[var(--glow-green)]">
-          <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-[var(--glow-green)] animate-ping" />
-            Phase 1 Foundation Ready
-          </span>
-          <span className="text-[var(--chrome-dark)]">•</span>
-          <span>Next.js 15 App Router</span>
-          <span className="text-[var(--chrome-dark)]">•</span>
-          <span>Tailwind CSS v4</span>
-        </div>
-      </div>
+        <span className="mt-2 font-mono text-[11px] tracking-wider text-[var(--chrome)] uppercase">
+          Cyber-Robotic Multiplayer Prompt-Injection Arena
+        </span>
+      </header>
+
+      {/* Victorian Android Butler */}
+      <section className="mb-8 flex justify-center">
+        <ButlerAvatar />
+      </section>
+
+      {/* Arena Grid: Red Team Attack vs Blue Team Defense */}
+      <section className="mb-8 grid w-full max-w-6xl grid-cols-1 gap-6 lg:grid-cols-2">
+        <AttackConsole />
+        <DefensePanel />
+      </section>
+
+      {/* Team Scores Arena */}
+      <section className="w-full max-w-6xl">
+        <ScoreBoard />
+      </section>
+
+      {/* Floating Jack-o'-lantern */}
+      <PumpkinLantern />
+
+      {/* Bottom Horizontal Live Ticker */}
+      <CurseTicker />
     </main>
   );
 }
-
