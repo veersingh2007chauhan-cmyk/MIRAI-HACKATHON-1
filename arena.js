@@ -270,6 +270,7 @@ function castCurse() {
   const result = MockButler.evaluate(payload, state.wards);
 
   if (result.blocked) {
+    state.blue.hits += 1;
     pushFeed('defense', `Blocked by ward: "${result.matchedWard}"`);
 
     const beam = $('.energy-beam');
@@ -278,6 +279,7 @@ function castCurse() {
       setTimeout(() => beam.classList.remove('is-firing'), 1200);
     }
 
+    renderScores();
     renderHealth();
   } else {
     // Breach
@@ -305,8 +307,18 @@ function castCurse() {
       setTimeout(() => blueCard.classList.remove('shake'), 500);
     }
 
+    renderScores();
+    renderHealth();
+
     if (state.blue.health <= 0) {
       endRound('red');
+      return;
+    }
+
+    // Auto-call endRound('score') if red or blue reaches 5 points
+    if (state.red.score >= 5 || state.blue.score >= 5) {
+      endRound('score');
+      return;
     }
   }
 
@@ -333,6 +345,7 @@ function addWard() {
 
   state.wards.push(newWard);
   state.blue.cast += 1;
+  state.blue.score += 1;
 
   pushFeed('defense', `New ward engaged: "${rule}"`);
 
@@ -344,6 +357,12 @@ function addWard() {
   const wardListEl = $('#wardList');
   if (wardListEl && wardListEl.lastElementChild) {
     wardListEl.lastElementChild.classList.add('is-new');
+  }
+
+  // Auto-call endRound('score') if blue or red reaches 5 points
+  if (state.blue.score >= 5 || state.red.score >= 5) {
+    endRound('score');
+    return;
   }
 }
 
@@ -407,20 +426,27 @@ function showRoundOverlay(winner) {
 
   const isFinalMatch = state.round >= state.maxRounds;
 
+  let winnerClass = 'is-draw';
+  if (winner.includes('RED')) {
+    winnerClass = 'is-red';
+  } else if (winner.includes('BLUE')) {
+    winnerClass = 'is-blue';
+  }
+
   const overlay = document.createElement('div');
   overlay.id = 'roundOverlay';
   overlay.className = 'round-overlay';
   overlay.innerHTML = `
-    <div class="round-overlay__content">
+    <div class="round-overlay__card">
       <div class="round-overlay__eyebrow">${isFinalMatch ? 'MATCH FINISHED' : `ROUND ${state.round} COMPLETE`}</div>
-      <h2 class="round-overlay__title">${winner === 'DRAW' ? 'STALEMATE' : `${winner} WINS`}</h2>
+      <h2 class="round-overlay__winner ${winnerClass}">${winner === 'DRAW' ? 'STALEMATE' : `${winner} WINS`}</h2>
       <div class="round-overlay__scores">
         <span class="score-red">RED ${state.red.score}</span>
         <span class="score-divider">/</span>
         <span class="score-blue">BLUE ${state.blue.score}</span>
       </div>
-      <button id="nextRoundBtn" class="btn ${winner.includes('BLUE') ? 'btn--defend' : 'btn--attack'} btn--lg" type="button">
-        ${isFinalMatch ? 'REPLAY MATCH' : 'NEXT ROUND →'}
+      <button id="nextRoundBtn" class="btn btn--attack btn--lg" type="button">
+        ${isFinalMatch ? 'PLAY AGAIN' : 'NEXT ROUND'}
       </button>
     </div>
   `;

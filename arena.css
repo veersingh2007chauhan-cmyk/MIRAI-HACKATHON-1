@@ -1051,34 +1051,72 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-/* Round Result Overlay */
+/* ==========================================================================
+   PROMPT 8 — FINAL POLISH: SHAKE, AUDIT, & ROUND OVERLAY
+   ========================================================================== */
+
+/* 1. Shake Animation */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+.agent-card.shake {
+  animation: shake 500ms var(--ease-out);
+}
+
+/* 2. Focus-Visible Audit */
+.curse-chip:focus-visible,
+.btn:focus-visible,
+.ward-item__remove:focus-visible,
+textarea:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--amber) !important;
+  outline-offset: 2px !important;
+}
+
+/* 3. Disabled State Audit */
+.btn:disabled,
+.curse-chip:disabled,
+.ward-item__remove:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+/* 4. Round Overlay Banner */
 .round-overlay {
   position: fixed;
   inset: 0;
-  z-index: 10000;
+  background: rgba(5, 5, 7, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(13, 17, 23, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: 1.5rem;
+  z-index: 9500;
   animation: feed-in 300ms ease-out;
 }
 
-.round-overlay__content {
+.round-overlay__card {
   background: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-lg);
-  padding: 2.5rem 3rem;
+  border: 2px solid var(--amber);
+  border-radius: var(--r-md);
+  padding: 2rem;
   text-align: center;
+  max-width: 480px;
+  width: 90%;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.25rem;
-  max-width: 480px;
-  width: 100%;
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 30px rgba(240, 180, 41, 0.15);
+  box-shadow: 0 0 30px rgba(240, 180, 41, 0.4);
 }
 
 .round-overlay__eyebrow {
@@ -1089,12 +1127,27 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--amber);
 }
 
-.round-overlay__title {
+.round-overlay__winner {
   font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--text);
+  text-transform: uppercase;
+}
+
+.round-overlay__winner.is-red {
+  color: var(--red);
+  text-shadow: 0 0 16px var(--red-glow);
+}
+
+.round-overlay__winner.is-blue {
+  color: var(--blue);
+  text-shadow: 0 0 16px var(--blue-glow);
+}
+
+.round-overlay__winner.is-draw {
+  color: var(--amber);
+  text-shadow: 0 0 16px rgba(240, 180, 41, 0.4);
 }
 
 .round-overlay__scores {
