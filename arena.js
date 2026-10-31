@@ -251,6 +251,79 @@ const MockButler = {
   }
 };
 
+function truncate(str, max = 40) {
+  if (!str) return '';
+  return str.length > max ? str.slice(0, max) : str;
+}
+
+function castCurse() {
+  const payloadInput = $('#payloadInput');
+  const payload = payloadInput ? payloadInput.value.trim() : '';
+
+  if (!payload) {
+    pushFeed('system', 'No payload written.');
+    return;
+  }
+
+  state.red.cast += 1;
+
+  const result = MockButler.evaluate(payload, state.wards);
+
+  if (result.blocked) {
+    pushFeed('defense', `Blocked by ward: "${result.matchedWard}"`);
+
+    const beam = $('.energy-beam');
+    if (beam) {
+      beam.classList.add('is-firing');
+      setTimeout(() => beam.classList.remove('is-firing'), 1200);
+    }
+
+    renderHealth();
+  } else {
+    // Breach
+    state.red.score += 1;
+    state.red.hits += 1;
+    state.blue.health = Math.max(0, state.blue.health - 20);
+
+    pushFeed('attack', `Breach! "${truncate(payload, 40)}..."`);
+
+    const beam = $('.energy-beam');
+    if (beam) {
+      beam.classList.add('is-firing');
+      setTimeout(() => beam.classList.remove('is-firing'), 1200);
+    }
+
+    const vignette = $('.vignette');
+    if (vignette) {
+      vignette.classList.add('is-active');
+      setTimeout(() => vignette.classList.remove('is-active'), 700);
+    }
+
+    const blueCard = $('.agent-card--blue');
+    if (blueCard) {
+      blueCard.classList.add('shake');
+      setTimeout(() => blueCard.classList.remove('shake'), 500);
+    }
+
+    if (state.blue.health <= 0) {
+      endRound('red');
+    }
+  }
+
+  if (payloadInput) payloadInput.value = '';
+  state.selectedCurse = null;
+  renderCurseChips();
+
+  renderScores();
+  renderHealth();
+}
+
+function endRound(winner) {
+  state.active = false;
+  const teamLabel = winner === 'red' ? 'RED TEAM' : 'BLUE TEAM';
+  pushFeed('system', `ROUND CONCLUDED: ${teamLabel} claims Round ${state.round}!`);
+}
+
 // 5. INITIAL WIRE-UP
 function init() {
   // Populate Avatars
@@ -258,6 +331,12 @@ function init() {
   const blueAvatar = $('#blueAvatar');
   if (redAvatar) redAvatar.src = AVATARS.red;
   if (blueAvatar) blueAvatar.src = AVATARS.blue;
+
+  // Bind Cast Button
+  const castBtn = $('#castBtn');
+  if (castBtn) {
+    castBtn.addEventListener('click', castCurse);
+  }
 
   // Initial Welcome Feed Entry
   pushFeed('system', 'Round 1 begins. Both butlers awakened.');
