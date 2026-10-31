@@ -55,40 +55,85 @@ function formatTime(totalSeconds) {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+function animateNumber(el, from, to, dur = 400) {
+  if (!el) return;
+  from = Number(from) || 0;
+  to = Number(to) || 0;
+  if (from === to) {
+    el.textContent = to;
+    return;
+  }
+  const startTime = performance.now();
+  function tick(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / dur, 1);
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(from + (to - from) * easeOut);
+    el.textContent = current;
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      el.textContent = to;
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+function pushFeed(type, badge, message) {
+  const now = new Date();
+  const timeStr = `${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+  state.feed.push({
+    time: timeStr,
+    type: type,
+    badge: badge,
+    message: message
+  });
+  renderFeed();
+}
+
 // 4. RENDER FUNCTIONS
-function renderScoreboard() {
-  const redScoreEl = $('#redScore');
-  const blueScoreEl = $('#blueScore');
+function renderScores() {
+  const targets = [
+    { el: $('#redScore'), val: state.red.score },
+    { el: $('#blueScore'), val: state.blue.score },
+    { el: $('#redCast'), val: state.red.cast },
+    { el: $('#redHits'), val: state.red.hits },
+    { el: $('#blueCast'), val: state.blue.cast },
+    { el: $('#blueHits'), val: state.blue.hits },
+  ];
+
+  targets.forEach(({ el, val }) => {
+    if (!el) return;
+    const current = parseInt(el.textContent, 10) || 0;
+    if (current !== val) {
+      animateNumber(el, current, val, 400);
+    } else {
+      el.textContent = val;
+    }
+  });
+
   const roundBadgeEl = $('.round-badge');
+  if (roundBadgeEl) {
+    roundBadgeEl.textContent = `ROUND ${state.round} / ${state.maxRounds}`;
+  }
+}
 
-  if (redScoreEl) redScoreEl.textContent = state.red.score;
-  if (blueScoreEl) blueScoreEl.textContent = state.blue.score;
-  if (roundBadgeEl) roundBadgeEl.textContent = `ROUND ${state.round} / ${state.maxRounds}`;
+function renderHealth() {
+  const redFill = $('#redHealthFill');
+  const blueFill = $('#blueHealthFill');
 
-  // Red Agent Stats & Health
-  const redCastEl = $('#redCast');
-  const redHitsEl = $('#redHits');
-  const redHealthFillEl = $('#redHealthFill');
-
-  if (redCastEl) redCastEl.textContent = state.red.cast;
-  if (redHitsEl) redHitsEl.textContent = state.red.hits;
-  if (redHealthFillEl) {
-    redHealthFillEl.style.width = `${Math.max(0, state.red.health)}%`;
-    redHealthFillEl.classList.toggle('is-low', state.red.health <= 40 && state.red.health > 15);
-    redHealthFillEl.classList.toggle('is-critical', state.red.health <= 15);
+  if (redFill) {
+    const redH = Math.max(0, Math.min(100, state.red.health));
+    redFill.style.width = `${redH}%`;
+    redFill.classList.toggle('is-low', redH > 25 && redH <= 50);
+    redFill.classList.toggle('is-critical', redH <= 25);
   }
 
-  // Blue Agent Stats & Health
-  const blueCastEl = $('#blueCast');
-  const blueHitsEl = $('#blueHits');
-  const blueHealthFillEl = $('#blueHealthFill');
-
-  if (blueCastEl) blueCastEl.textContent = state.blue.cast;
-  if (blueHitsEl) blueHitsEl.textContent = state.blue.hits;
-  if (blueHealthFillEl) {
-    blueHealthFillEl.style.width = `${Math.max(0, state.blue.health)}%`;
-    blueHealthFillEl.classList.toggle('is-low', state.blue.health <= 40 && state.blue.health > 15);
-    blueHealthFillEl.classList.toggle('is-critical', state.blue.health <= 15);
+  if (blueFill) {
+    const blueH = Math.max(0, Math.min(100, state.blue.health));
+    blueFill.style.width = `${blueH}%`;
+    blueFill.classList.toggle('is-low', blueH > 25 && blueH <= 50);
+    blueFill.classList.toggle('is-critical', blueH <= 25);
   }
 }
 
@@ -96,16 +141,31 @@ function renderWards() {
   const wardListEl = $('#wardList');
   if (!wardListEl) return;
 
-  wardListEl.innerHTML = state.wards
-    .map(
-      (ward) => `
-      <div class="ward-item" data-id="${ward.id}">
-        <span class="ward-item__rule">${escapeHtml(ward.rule)}</span>
-        <button class="ward-item__remove" type="button" aria-label="Remove ward rule ${ward.id}" data-id="${ward.id}">✕</button>
-      </div>
-    `
-    )
-    .join('');
+  wardListEl.innerHTML = '';
+  state.wards.forEach((ward) => {
+    const item = document.createElement('div');
+    item.className = 'ward-item';
+    item.setAttribute('data-ward-id', ward.id);
+
+    const span = document.createElement('span');
+    span.textContent = ward.rule;
+
+    const btn = document.createElement('button');
+    btn.className = 'ward-item__remove';
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('aria-label', 'Remove ward');
+    btn.textContent = '✕';
+
+    btn.addEventListener('click', () => {
+      state.wards = state.wards.filter((w) => w.id !== ward.id);
+      renderWards();
+      pushFeed('system', 'SYSTEM', 'Ward removed');
+    });
+
+    item.appendChild(span);
+    item.appendChild(btn);
+    wardListEl.appendChild(item);
+  });
 }
 
 function renderFeed() {
@@ -151,7 +211,8 @@ function init() {
   });
 
   // Initial Render Pass
-  renderScoreboard();
+  renderScores();
+  renderHealth();
   renderWards();
   renderFeed();
   renderCurseChips();
