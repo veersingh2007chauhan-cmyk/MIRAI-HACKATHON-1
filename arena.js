@@ -318,10 +318,156 @@ function castCurse() {
   renderHealth();
 }
 
-function endRound(winner) {
+// 4. GAME FLOW & LOGIC (PROMPT 7)
+function addWard() {
+  const wardInput = $('#wardInput');
+  const val = wardInput ? wardInput.value.trim() : '';
+
+  if (!val) {
+    pushFeed('system', 'Ward rule cannot be empty.');
+    return;
+  }
+
+  const rule = val.toLowerCase().startsWith('block:') ? val : 'block:' + val;
+  const newWard = { id: Date.now(), rule };
+
+  state.wards.push(newWard);
+  state.blue.cast += 1;
+
+  pushFeed('defense', `New ward engaged: "${rule}"`);
+
+  if (wardInput) wardInput.value = '';
+  renderWards();
+  renderScores();
+
+  // Animation on new ward
+  const wardListEl = $('#wardList');
+  if (wardListEl && wardListEl.lastElementChild) {
+    wardListEl.lastElementChild.classList.add('is-new');
+  }
+}
+
+// ROUND TIMER
+let timerInterval = null;
+let timeLeft = 120;
+
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  const timerEl = $('#roundTimer');
+  if (timerEl) timerEl.textContent = formatTime(timeLeft);
+
+  timerInterval = setInterval(() => {
+    timeLeft -= 1;
+    if (timerEl) timerEl.textContent = formatTime(Math.max(0, timeLeft));
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      endRound('timeout');
+    }
+  }, 1000);
+}
+
+// END ROUND
+function endRound(reason) {
+  if (!state.active) return;
   state.active = false;
-  const teamLabel = winner === 'red' ? 'RED TEAM' : 'BLUE TEAM';
-  pushFeed('system', `ROUND CONCLUDED: ${teamLabel} claims Round ${state.round}!`);
+
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  let winner = 'draw';
+  if (reason === 'red') {
+    winner = 'RED TEAM';
+  } else if (reason === 'blue') {
+    winner = 'BLUE TEAM';
+  } else if (state.red.score > state.blue.score) {
+    winner = 'RED TEAM';
+  } else if (state.blue.score > state.red.score) {
+    winner = 'BLUE TEAM';
+  } else {
+    winner = 'DRAW';
+  }
+
+  pushFeed('system', `Round over. Winner: ${winner}.`);
+
+  // Disable combat buttons
+  ['#castBtn', '#wardBtn', '#clearBtn', '#purgeBtn'].forEach((sel) => {
+    const btn = $(sel);
+    if (btn) btn.disabled = true;
+  });
+
+  showRoundOverlay(winner);
+}
+
+function showRoundOverlay(winner) {
+  const existing = $('#roundOverlay');
+  if (existing) existing.remove();
+
+  const isFinalMatch = state.round >= state.maxRounds;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'roundOverlay';
+  overlay.className = 'round-overlay';
+  overlay.innerHTML = `
+    <div class="round-overlay__content">
+      <div class="round-overlay__eyebrow">${isFinalMatch ? 'MATCH FINISHED' : `ROUND ${state.round} COMPLETE`}</div>
+      <h2 class="round-overlay__title">${winner === 'DRAW' ? 'STALEMATE' : `${winner} WINS`}</h2>
+      <div class="round-overlay__scores">
+        <span class="score-red">RED ${state.red.score}</span>
+        <span class="score-divider">/</span>
+        <span class="score-blue">BLUE ${state.blue.score}</span>
+      </div>
+      <button id="nextRoundBtn" class="btn ${winner.includes('BLUE') ? 'btn--defend' : 'btn--attack'} btn--lg" type="button">
+        ${isFinalMatch ? 'REPLAY MATCH' : 'NEXT ROUND →'}
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  const nextBtn = $('#nextRoundBtn');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      overlay.remove();
+      if (isFinalMatch) {
+        location.reload();
+      } else {
+        startNextRound();
+      }
+    });
+  }
+}
+
+function startNextRound() {
+  state.round += 1;
+  state.red = { score: 0, cast: 0, hits: 0, health: 100 };
+  state.blue = { score: 0, cast: 0, hits: 0, health: 100 };
+  state.wards = [
+    { id: 1, rule: 'block:ignore previous instructions' },
+    { id: 2, rule: 'block:you are now' },
+    { id: 3, rule: 'block:system prompt' }
+  ];
+  state.feed = [];
+  state.selectedCurse = null;
+  state.active = true;
+  timeLeft = 120;
+
+  // Re-enable buttons
+  ['#castBtn', '#wardBtn', '#clearBtn', '#purgeBtn'].forEach((sel) => {
+    const btn = $(sel);
+    if (btn) btn.disabled = false;
+  });
+
+  renderScores();
+  renderHealth();
+  renderWards();
+  renderCurseChips();
+  renderFeed();
+
+  pushFeed('system', `Round ${state.round} begins. Both butlers awakened.`);
+  startTimer();
 }
 
 // 5. INITIAL WIRE-UP
@@ -338,6 +484,59 @@ function init() {
     castBtn.addEventListener('click', castCurse);
   }
 
+  // Bind Ward Button & Enter on Ward Input
+  const wardBtn = $('#wardBtn');
+  const wardInput = $('#wardInput');
+  if (wardBtn) {
+    wardBtn.addEventListener('click', addWard);
+  }
+  if (wardInput) {
+    wardInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addWard();
+      }
+    });
+  }
+
+  // Bind Clear Button
+  const clearBtn = $('#clearBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      const payloadInput = $('#payloadInput');
+      if (payloadInput) payloadInput.value = '';
+      state.selectedCurse = null;
+      renderCurseChips();
+    });
+  }
+
+  // Bind Purge Button
+  const purgeBtn = $('#purgeBtn');
+  if (purgeBtn) {
+    purgeBtn.addEventListener('click', () => {
+      if (confirm('Purge all defensive wards?')) {
+        state.wards = [];
+        renderWards();
+        pushFeed('system', 'All wards purged.');
+      }
+    });
+  }
+
+  // Bind Header Reset and End Round Buttons
+  const resetBtn = $('#resetBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      location.reload();
+    });
+  }
+
+  const endBtn = $('#endBtn');
+  if (endBtn) {
+    endBtn.addEventListener('click', () => {
+      endRound('manual');
+    });
+  }
+
   // Initial Welcome Feed Entry
   pushFeed('system', 'Round 1 begins. Both butlers awakened.');
 
@@ -346,6 +545,9 @@ function init() {
   renderHealth();
   renderWards();
   renderCurseChips();
+
+  // Start Countdown Timer
+  startTimer();
 }
 
 // Run on load
