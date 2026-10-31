@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CURSE 03 — Possessed Butler: Adversarial Attack &amp; Defense Arena. Red Team prompt injection vs Blue Team defensive wards.">
+  <title>CURSE 03 — Possessed Butler</title>
+  
+  <!-- Google Fonts: Rajdhani (500,700), JetBrains Mono (400,600), Inter (400,500,600) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="arena.css">
+</head>
+<body>
+  <!-- Vignette overlay for hit and alert events -->
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- ARENA HEADER -->
+  <header class="arena-header">
+    <div class="header-brand">
+      <span class="sigil-dot" aria-hidden="true"></span>
+      <div class="brand-text">
+        <h1 class="brand-title">CURSE 03</h1>
+        <span class="brand-subtitle">Possessed Butler</span>
+      </div>
+    </div>
+
+    <div class="round-banner">
+      <span class="pulse-pill" aria-label="Round Status">ACTIVE MIDNIGHT CURSE</span>
+      <div class="round-timer" id="roundTimer" aria-label="Round Timer">02:00</div>
+    </div>
+
+    <div class="header-actions">
+      <button id="resetBtn" class="btn btn--ghost" type="button" aria-label="Reset Round">RESET ROUND</button>
+      <button id="endBtn" class="btn btn--attack" type="button" aria-label="End Round">END ROUND</button>
+    </div>
+  </header>
+
+  <!-- ARENA MAIN -->
+  <main class="arena-main">
+    <!-- 1. SCOREBOARD -->
+    <section class="scoreboard" aria-label="Scoreboard">
+      <div class="score-card score-card--red">
+        <span class="team-label">RED TEAM</span>
+        <span class="score-value" id="redScore">0</span>
+        <span class="score-sublabel">ATTACK POINTS</span>
+      </div>
+
+      <div class="score-center">
+        <div class="round-badge">ROUND 1 / 3</div>
+        <span class="round-caption">FIRST TO 5</span>
+      </div>
+
+      <div class="score-card score-card--blue">
+        <span class="team-label">BLUE TEAM</span>
+        <span class="score-value" id="blueScore">0</span>
+        <span class="score-sublabel">DEFENSE POINTS</span>
+      </div>
+    </section>
+
+    <!-- 2. DUEL ARENA -->
+    <section class="duel-arena" aria-label="Duel Arena">
+      <!-- Red Agent (Attacker) -->
+      <article class="agent-card agent-card--red">
+        <div class="agent-avatar-wrap">
+          <img id="redAvatar" src="" alt="The Injector - Red Team Attacker Butler avatar" class="agent-avatar">
+        </div>
+        <h2 class="agent-name">THE INJECTOR</h2>
+        <div class="agent-stats">
+          <div class="stat-group">
+            <span class="stat-label">Curses Cast</span>
+            <span class="stat-value" id="redCast">0</span>
+          </div>
+          <div class="stat-group">
+            <span class="stat-label">Success</span>
+            <span class="stat-value" id="redHits">0</span>
+          </div>
+        </div>
+        <div class="agent-health" role="progressbar" aria-label="The Injector Health" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+          <div class="agent-health__fill" id="redHealthFill"></div>
+        </div>
+      </article>
+
+      <!-- Center Divider -->
+      <div class="duel-divider" aria-hidden="true">
+        <span class="vs-text">VS</span>
+        <div class="energy-beam"></div>
+        <span class="duel-status">LIVE ROUND</span>
+      </div>
+
+      <!-- Blue Agent (Defender) -->
+      <article class="agent-card agent-card--blue">
+        <div class="agent-avatar-wrap">
+          <img id="blueAvatar" src="" alt="The Warden - Blue Team Defender Butler avatar" class="agent-avatar">
+        </div>
+        <h2 class="agent-name">THE WARDEN</h2>
+        <div class="agent-stats">
+          <div class="stat-group">
+            <span class="stat-label">Curses Cast</span>
+            <span class="stat-value" id="blueCast">0</span>
+          </div>
+          <div class="stat-group">
+            <span class="stat-label">Success</span>
+            <span class="stat-value" id="blueHits">0</span>
+          </div>
+        </div>
+        <div class="agent-health" role="progressbar" aria-label="The Warden Health" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+          <div class="agent-health__fill" id="blueHealthFill"></div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 3. COMBAT PANEL (SPLIT INPUT) -->
+    <section class="combat-panel" aria-label="Combat Controls">
+      <!-- Left: Attack Console -->
+      <div class="attack-console">
+        <div class="console-header">
+          <span class="eyebrow">RED TEAM INPUT</span>
+          <h2 class="console-title">CURSE INJECTION</h2>
+        </div>
+
+        <div class="curse-palette" role="group" aria-label="Preset Curse Payloads">
+          <button class="curse-chip" data-curse="override" type="button">Prompt Override</button>
+          <button class="curse-chip" data-curse="hijack" type="button">Role Hijack</button>
+          <button class="curse-chip" data-curse="poison" type="button">Data Poison</button>
+          <button class="curse-chip" data-curse="canary" type="button">Canary Leak</button>
+          <button class="curse-chip" data-curse="nested" type="button">Nested Curse</button>
+        </div>
+
+        <div class="form-group">
+          <label for="payloadInput" class="form-label">Or write a custom curse:</label>
+          <textarea id="payloadInput" class="payload-input" placeholder="Type your curse payload..." aria-label="Custom curse payload input"></textarea>
+        </div>
+
+        <div class="button-row">
+          <button id="castBtn" class="btn btn--attack btn--lg" type="button" aria-label="Cast Curse Payload">CAST CURSE</button>
+          <button id="clearBtn" class="btn btn--ghost" type="button" aria-label="Clear payload text">CLEAR</button>
+        </div>
+      </div>
+
+      <!-- Right: Defense Console -->
+      <div class="defense-console">
+        <div class="console-header">
+          <span class="eyebrow">BLUE TEAM INPUT</span>
+          <h2 class="console-title">WARD ENGINE</h2>
+        </div>
+
+        <!-- Wards list will be populated dynamically by JS with starter wards -->
+        <div class="ward-list" id="wardList" role="region" aria-label="Active Defense Wards">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="form-group">
+          <label for="wardInput" class="form-label">Add a ward rule:</label>
+          <input id="wardInput" class="ward-input" placeholder="e.g. block:ignore previous" aria-label="New ward rule definition" />
+        </div>
+
+        <div class="button-row">
+          <button id="wardBtn" class="btn btn--defend btn--lg" type="button" aria-label="Engage Ward Rule">ENGAGE WARD</button>
+          <button id="purgeBtn" class="btn btn--ghost" type="button" aria-label="Purge all active wards">PURGE ALL</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. LIVE FEED -->
+    <section class="live-feed" aria-label="Live Battle Feed">
+      <div class="live-feed__title">
+        <span class="feed-pulse" aria-hidden="true"></span>
+        <h2>LIVE BATTLE FEED</h2>
+      </div>
+
+      <div class="feed-log" id="feedLog" role="log" aria-live="polite" aria-atomic="false">
+        <!-- Log entries populated dynamically -->
+      </div>
+
+      <p class="live-feed__caption">All actions broadcast live to both teams</p>
+    </section>
+  </main>
+
+  <script src="arena.js" defer></script>
+</body>
+</html>
