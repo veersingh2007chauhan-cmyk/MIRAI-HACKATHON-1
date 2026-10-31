@@ -844,3 +844,208 @@ h1, h2, h3, h4, h5, h6 {
   gap: 0.6rem;
   margin-top: 1rem;
 }
+
+
+/* ==========================================================================
+   PROMPT 5 — LIVE FEED, VIGNETTE, ANIMATIONS
+   ========================================================================== */
+
+/* Live Feed Panel */
+.live-feed {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 1.25rem;
+}
+
+.live-feed__title {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  padding-bottom: 0.5rem;
+  z-index: 2;
+}
+
+.live-feed__title h2 {
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  font-weight: 600;
+  color: inherit;
+}
+
+.feed-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-full);
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red-glow);
+  animation: live-pulse 1.2s infinite;
+  display: inline-block;
+}
+
+#feedLog,
+.feed-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.feed-entry {
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--r-sm);
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 2px solid var(--border);
+  animation: feed-in 300ms ease-out;
+}
+
+.feed-entry--attack {
+  border-left-color: var(--red);
+  color: #ffb0be;
+}
+
+.feed-entry--defense {
+  border-left-color: var(--blue);
+  color: #b0d6ff;
+}
+
+.feed-entry--system {
+  border-left-color: var(--amber);
+  color: #ffe4a3;
+}
+
+.feed-entry__time {
+  color: var(--text-faint);
+}
+
+.feed-entry__badge {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  border-radius: var(--r-full);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+.feed-entry--attack .feed-entry__badge {
+  color: var(--red);
+  background: rgba(255, 56, 96, 0.15);
+  border: 1px solid rgba(255, 56, 96, 0.35);
+}
+
+.feed-entry--defense .feed-entry__badge {
+  color: var(--blue);
+  background: rgba(45, 156, 255, 0.15);
+  border: 1px solid rgba(45, 156, 255, 0.35);
+}
+
+.feed-entry--system .feed-entry__badge {
+  color: var(--amber);
+  background: rgba(240, 180, 41, 0.15);
+  border: 1px solid rgba(240, 180, 41, 0.35);
+}
+
+.live-feed__caption {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+  margin-top: 0.75rem;
+}
+
+/* Vignette */
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+  background: radial-gradient(circle at center, transparent 35%, rgba(255, 56, 96, 0.35) 100%);
+  opacity: 0;
+  transition: opacity 400ms ease-out;
+}
+
+.vignette.is-active {
+  opacity: 1;
+}
+
+/* Keyframes */
+@keyframes feed-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes energy-travel {
+  from {
+    background-position: 0% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes beam-fire {
+  0%, 100% {
+    height: 2px;
+    opacity: 0.6;
+    filter: brightness(1);
+  }
+  50% {
+    height: 6px;
+    opacity: 1;
+    filter: brightness(2);
+  }
+}
+
+/* Beam Active State */
+.energy-beam {
+  background-size: 200% 100%;
+}
+
+.energy-beam.is-firing {
+  animation: beam-fire 600ms var(--ease-out) 2, energy-travel 1.2s linear infinite;
+}
+
+/* Responsive Feed */
+@media (max-width: 700px) {
+  .feed-entry {
+    grid-template-columns: 60px 1fr;
+  }
+
+  .feed-entry__badge {
+    display: none;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
