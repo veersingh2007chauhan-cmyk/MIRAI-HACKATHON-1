@@ -110,3 +110,4 @@ export function AttackConsole(): React.JSX.Element {
     </div>
   );
 }
+

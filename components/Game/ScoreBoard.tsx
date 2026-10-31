@@ -88,3 +88,4 @@ export function ScoreBoard(): React.JSX.Element {
     </div>
   );
 }
+

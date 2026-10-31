@@ -26,3 +26,4 @@ export function NeonBadge({
     </span>
   );
 }
+

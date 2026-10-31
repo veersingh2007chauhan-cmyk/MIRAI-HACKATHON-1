@@ -121,3 +121,4 @@ export function analyzeCursePayload(payload: string, curseType?: string): CurseE
     basePoints: 30,
   };
 }
+
