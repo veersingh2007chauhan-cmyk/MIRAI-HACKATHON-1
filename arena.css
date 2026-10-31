@@ -594,3 +594,253 @@ h1, h2, h3, h4, h5, h6 {
     background: linear-gradient(to right, transparent, var(--red), var(--amber), var(--blue), transparent);
   }
 }
+
+
+/* ==========================================================================
+   PROMPT 4 — COMBAT CONSOLE COMPONENTS
+   ========================================================================== */
+
+/* Panel Titles & Eyebrows */
+.combat-panel h2 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.25rem;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.attack-console .eyebrow {
+  color: var(--red);
+}
+
+.defense-console .eyebrow {
+  color: var(--blue);
+}
+
+/* Curse Chips */
+.curse-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.curse-chip {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--r-full);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  transition: all var(--dur-fast);
+}
+
+.curse-chip:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(255, 56, 96, 0.08);
+  box-shadow: 0 0 14px var(--red-glow);
+}
+
+.curse-chip.is-selected {
+  background: rgba(255, 56, 96, 0.16);
+  border-color: var(--red);
+  color: var(--red);
+  box-shadow: 0 0 20px var(--red-glow);
+}
+
+.curse-chip:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* Textarea / Input */
+.field-label,
+.form-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.payload-input,
+.ward-input {
+  width: 100%;
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  padding: 0.85rem 1rem;
+  color: var(--text);
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+
+.payload-input {
+  min-height: 110px;
+  resize: vertical;
+  caret-color: var(--red);
+}
+
+.ward-input {
+  caret-color: var(--blue);
+}
+
+.payload-input:focus {
+  outline: none;
+  border-color: var(--red);
+  box-shadow: 0 0 0 1px var(--red), 0 0 20px var(--red-glow);
+}
+
+.ward-input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue), 0 0 20px var(--blue-glow);
+}
+
+/* Buttons */
+.btn {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0.65rem 1.2rem;
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: transparent;
+  transition: all var(--dur-fast);
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn--lg {
+  padding: 0.85rem 1.6rem;
+  font-size: 0.78rem;
+}
+
+.btn--attack {
+  color: var(--red);
+  border-color: rgba(255, 56, 96, 0.5);
+  box-shadow: 0 0 14px rgba(255, 56, 96, 0.2);
+}
+
+.btn--attack:hover {
+  background: rgba(255, 56, 96, 0.1);
+  box-shadow: 0 0 28px var(--red-glow);
+}
+
+.btn--defend {
+  color: var(--blue);
+  border-color: rgba(45, 156, 255, 0.5);
+  box-shadow: 0 0 14px rgba(45, 156, 255, 0.2);
+}
+
+.btn--defend:hover {
+  background: rgba(45, 156, 255, 0.1);
+  box-shadow: 0 0 28px var(--blue-glow);
+}
+
+.btn--ghost {
+  color: var(--text-dim);
+  border-color: var(--border);
+}
+
+.btn--ghost:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Ward List */
+.ward-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.ward-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  border-left: 2px solid var(--blue);
+  color: var(--text);
+}
+
+.ward-item__remove {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color var(--dur-fast);
+}
+
+.ward-item__remove:hover {
+  color: var(--red);
+}
+
+.ward-item.is-new {
+  animation: ward-in 300ms ease-out;
+}
+
+@keyframes ward-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Button Row */
+.button-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
