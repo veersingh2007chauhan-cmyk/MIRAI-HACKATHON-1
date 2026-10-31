@@ -4,6 +4,28 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Dynamic API Base: works on port 8000, Live Server port 5500, or file://
+  const API_BASE = (window.location.port === "8000" && window.location.protocol.startsWith("http"))
+    ? ""
+    : "http://127.0.0.1:8000";
+
+  // Check backend connection
+  async function checkBackendConnection() {
+    const statusText = document.getElementById("backend-status");
+    try {
+      const res = await fetch(`${API_BASE}/api/config`);
+      if (res.ok && statusText) {
+        statusText.textContent = "SHIELD ACTIVE (CONNECTED TO PORT 8000)";
+      }
+    } catch (e) {
+      if (statusText) {
+        statusText.innerHTML = "BACKEND OFFLINE — Run: <code>python server.py</code>";
+        statusText.style.color = "var(--accent-red)";
+      }
+    }
+  }
+  checkBackendConnection();
+
   // DOM Elements
   const tabButtons = document.querySelectorAll(".tab-btn");
   const tabPanes = document.querySelectorAll(".tab-pane");
@@ -116,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       };
 
-      const res = await fetch("/api/defend", {
+      const res = await fetch(`${API_BASE}/api/defend`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -150,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
         target: targetSelector.value,
       };
 
-      const res = await fetch("/api/undefended", {
+      const res = await fetch(`${API_BASE}/api/undefended`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -320,7 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
     batchTableBody.innerHTML = `<tr><td colspan="7" class="empty-state">Running benchmark suite... please wait.</td></tr>`;
 
     try {
-      const res = await fetch("/api/batch", {
+      const res = await fetch(`${API_BASE}/api/batch`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -382,7 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadConfig() {
     try {
-      const res = await fetch("/api/config");
+      const res = await fetch(`${API_BASE}/api/config`);
       if (!res.ok) return;
       const data = await res.json();
       cfgCanaries.value = (data.canary_tokens || []).join(", ");
@@ -408,7 +430,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       };
 
-      const res = await fetch("/api/config", {
+      const res = await fetch(`${API_BASE}/api/config`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
