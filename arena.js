@@ -79,15 +79,23 @@ function animateNumber(el, from, to, dur = 400) {
   requestAnimationFrame(tick);
 }
 
-function pushFeed(type, badge, message) {
+function pushFeed(type, message) {
   const now = new Date();
-  const timeStr = `${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-  state.feed.push({
-    time: timeStr,
-    type: type,
-    badge: badge,
-    message: message
-  });
+  const time = [now.getHours(), now.getMinutes(), now.getSeconds()]
+    .map((n) => String(n).padStart(2, '0'))
+    .join(':');
+
+  const badgeMap = {
+    attack: 'ATTACK',
+    defense: 'DEFENSE',
+    system: 'SYS'
+  };
+  const badge = badgeMap[type] || 'SYS';
+
+  state.feed.unshift({ time, type, message, badge });
+  if (state.feed.length > 100) {
+    state.feed.length = 100;
+  }
   renderFeed();
 }
 
@@ -172,25 +180,54 @@ function renderFeed() {
   const feedLogEl = $('#feedLog');
   if (!feedLogEl) return;
 
-  feedLogEl.innerHTML = state.feed
-    .map(
-      (entry) => `
-      <div class="feed-entry feed-entry--${entry.type || 'system'}">
-        <span class="feed-entry__time">${escapeHtml(entry.time)}</span>
-        <span class="feed-entry__message">${escapeHtml(entry.message)}</span>
-        <span class="feed-entry__badge">${escapeHtml(entry.badge || 'LOG')}</span>
-      </div>
-    `
-    )
-    .join('');
+  feedLogEl.innerHTML = '';
+  // Append the last 30 entries of state.feed in chronological order
+  const entries = state.feed.slice(0, 30).reverse();
+
+  entries.forEach((entry) => {
+    const div = document.createElement('div');
+    div.className = `feed-entry feed-entry--${entry.type}`;
+
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'feed-entry__time';
+    timeSpan.textContent = entry.time;
+
+    const msgSpan = document.createElement('span');
+    msgSpan.className = 'feed-entry__msg';
+    msgSpan.textContent = entry.message;
+
+    const badgeSpan = document.createElement('span');
+    badgeSpan.className = 'feed-entry__badge';
+    badgeSpan.textContent = entry.badge;
+
+    div.appendChild(timeSpan);
+    div.appendChild(msgSpan);
+    div.appendChild(badgeSpan);
+    feedLogEl.appendChild(div);
+  });
 
   feedLogEl.scrollTop = feedLogEl.scrollHeight;
 }
 
 function renderCurseChips() {
-  $$('.curse-chip').forEach((chip) => {
-    const curseKey = chip.dataset.curse;
-    chip.classList.toggle('is-selected', state.selectedCurse === curseKey);
+  const chips = $$('.curse-chip');
+  const payloadInput = $('#payloadInput');
+
+  chips.forEach((chip) => {
+    const datasetId = chip.dataset.curse;
+    chip.classList.toggle('is-selected', state.selectedCurse === datasetId);
+
+    if (!chip._hasCurseListener) {
+      chip.addEventListener('click', () => {
+        chips.forEach((c) => c.classList.remove('is-selected'));
+        chip.classList.add('is-selected');
+        state.selectedCurse = datasetId;
+        if (payloadInput && CURSES[datasetId]) {
+          payloadInput.value = CURSES[datasetId].payload;
+        }
+      });
+      chip._hasCurseListener = true;
+    }
   });
 }
 
@@ -203,18 +240,12 @@ function init() {
   if (blueAvatar) blueAvatar.src = AVATARS.blue;
 
   // Initial Welcome Feed Entry
-  state.feed.push({
-    time: '00:00',
-    type: 'system',
-    badge: 'SYSTEM',
-    message: 'Round 1 initialized. The Injector vs The Warden.'
-  });
+  pushFeed('system', 'Round 1 initialized. The Injector vs The Warden.');
 
   // Initial Render Pass
   renderScores();
   renderHealth();
   renderWards();
-  renderFeed();
   renderCurseChips();
 }
 
