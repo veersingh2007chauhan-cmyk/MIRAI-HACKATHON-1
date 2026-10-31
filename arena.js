@@ -51,8 +51,8 @@ const AVATARS = {
 };
 
 // 3. DOM HELPERS
-const $ = (selector) => document.querySelector(selector);
-const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
 
 function escapeHtml(str) {
   if (typeof str !== 'string') return '';
@@ -178,3 +178,4 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
