@@ -1,0 +1,195 @@
+@import "tailwindcss";
+
+:root {
+  /* Core palette — Robo-Halloween */
+  --bg-void: #050508;
+  --bg-panel: #0d0d14;
+  --chrome: #8a9bb0;
+  --chrome-dark: #3d4a5c;
+  --glow-red: #ff2a2a;
+  --glow-orange: #ff6b00;
+  --glow-green: #00ff88;
+  --glow-purple: #9b30ff;
+  --bone: #e8dcc8;
+  --smoke: #1a1a2e;
+  --ectoplasm: #4affd4;
+
+  /* Typography */
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Rajdhani', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-cursed: 'UnifrakturMaguntia', serif;
+}
+
+@theme {
+  --color-void: var(--bg-void);
+  --color-panel: var(--bg-panel);
+  --color-chrome: var(--chrome);
+  --color-chrome-dark: var(--chrome-dark);
+  --color-glow-red: var(--glow-red);
+  --color-glow-orange: var(--glow-orange);
+  --color-glow-green: var(--glow-green);
+  --color-glow-purple: var(--glow-purple);
+  --color-bone: var(--bone);
+  --color-smoke: var(--smoke);
+  --color-ectoplasm: var(--ectoplasm);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+  --font-cursed: var(--font-cursed);
+}
+
+/* Base Body Styles */
+body {
+  background-color: var(--bg-void);
+  color: var(--bone);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ----------------------------------------------------
+   ANIMATION KEYFRAMES (Respecting prefers-reduced-motion)
+------------------------------------------------------- */
+
+/* 1. Fog Drift: 60s linear infinite loop, translateX(-50%) */
+@keyframes fogDrift {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-fog {
+  animation: fogDrift 60s linear infinite;
+}
+
+/* 2. Circuit Pulse: box-shadow / drop-shadow with 2s ease-in-out infinite */
+@keyframes circuitPulse {
+  0%, 100% {
+    opacity: 0.35;
+    filter: drop-shadow(0 0 2px var(--glow-green));
+  }
+  50% {
+    opacity: 0.85;
+    filter: drop-shadow(0 0 10px var(--glow-green));
+  }
+}
+
+.animate-circuit-pulse {
+  animation: circuitPulse 2s ease-in-out infinite;
+}
+
+/* 3. Butler Twitch: 3-frame keyframe on .twitching class, 120ms duration */
+@keyframes twitchFrames {
+  0% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(-3px, 1px);
+  }
+  66% {
+    transform: translate(3px, -2px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.twitching {
+  animation: twitchFrames 120ms ease-in-out;
+}
+
+/* 4. Candle Flicker: steps(4) timing */
+@keyframes candleFlicker {
+  0% {
+    transform: scale(1) rotate(-1deg);
+    opacity: 0.9;
+  }
+  25% {
+    transform: scale(1.05, 0.95) rotate(1deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(0.95, 1.05) rotate(-0.5deg);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.02, 0.98) rotate(1.5deg);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1) rotate(-1deg);
+    opacity: 0.9;
+  }
+}
+
+.animate-flame {
+  animation: candleFlicker 1.8s steps(4) infinite;
+}
+
+/* 5. Zalgo text animation */
+@keyframes zalgoGlitch {
+  0%, 100% {
+    text-shadow: 
+      -1px -1px 0 var(--glow-red),
+      1px 1px 0 var(--glow-purple),
+      0 0 6px rgba(155, 48, 255, 0.6);
+  }
+  50% {
+    text-shadow: 
+      2px -1px 0 var(--glow-purple),
+      -2px 1px 0 var(--glow-red),
+      0 0 12px rgba(255, 42, 42, 0.8);
+  }
+}
+
+.zalgo-animated {
+  animation: zalgoGlitch 2.5s ease-in-out infinite;
+}
+
+/* 6. Possession Overlay: opacity 0->0.4 in 200ms, hold 800ms, fade out 400ms */
+@keyframes possessionPulse {
+  0% {
+    opacity: 0;
+  }
+  14% {
+    opacity: 0.4;
+  }
+  71% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.possession-active {
+  animation: possessionPulse 1400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fog,
+  .animate-circuit-pulse,
+  .twitching,
+  .animate-flame,
+  .zalgo-animated,
+  .possession-active {
+    animation: none !important;
+  }
+}
+
