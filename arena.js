@@ -231,6 +231,26 @@ function renderCurseChips() {
   });
 }
 
+// ============================================================================
+// PROMPT 7 — MOCK BUTLER AGENT (Deterministic Evaluation)
+// ============================================================================
+const MockButler = {
+  // Returns { blocked: bool, matchedWard: string|null }
+  evaluate(payload, wards) {
+    const lower = payload.toLowerCase();
+    for (const ward of wards) {
+      const rule = ward.rule.toLowerCase();
+      if (rule.startsWith('block:')) {
+        const pattern = rule.slice(6).trim();
+        if (pattern && lower.includes(pattern)) {
+          return { blocked: true, matchedWard: ward.rule };
+        }
+      }
+    }
+    return { blocked: false, matchedWard: null };
+  }
+};
+
 // 5. INITIAL WIRE-UP
 function init() {
   // Populate Avatars
@@ -240,7 +260,7 @@ function init() {
   if (blueAvatar) blueAvatar.src = AVATARS.blue;
 
   // Initial Welcome Feed Entry
-  pushFeed('system', 'Round 1 initialized. The Injector vs The Warden.');
+  pushFeed('system', 'Round 1 begins. Both butlers awakened.');
 
   // Initial Render Pass
   renderScores();
