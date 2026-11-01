@@ -28,6 +28,7 @@ const state = {
   },
   consecutiveBlocks: 0,
   payloadWasMutated: false,
+  battleStarted: false,
   round: 1,
   maxRounds: 3,
   active: true,
@@ -298,6 +299,23 @@ function renderChronologyRail() {
   });
 }
 
+function renderLockSvg(isUnlocked) {
+  if (isUnlocked) {
+    return `<svg class="quest-lock-svg is-unlocked" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M7 11V7a5 5 0 0 1 9.9-1.2" stroke="#4affd4" stroke-width="2" stroke-linecap="round"/>
+      <rect x="4" y="11" width="16" height="11" rx="2.5" fill="rgba(74, 255, 212, 0.18)" stroke="#4affd4" stroke-width="2"/>
+      <circle cx="12" cy="16" r="1.5" fill="#4affd4"/>
+      <path d="M10 17.5l1.5 1.5 3-3" stroke="#4affd4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+  }
+  return `<svg class="quest-lock-svg is-locked" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <rect x="4" y="11" width="16" height="11" rx="2.5" fill="rgba(196, 113, 237, 0.16)" stroke="currentColor" stroke-width="2"/>
+    <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+    <path d="M12 17.5v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </svg>`;
+}
+
 function unlockQuest(key, cardId, iconId) {
   if (!state.quests || state.quests[key]) return;
   state.quests[key] = true;
@@ -309,7 +327,7 @@ function unlockQuest(key, cardId, iconId) {
     card.classList.add('is-unlocked');
   }
   if (icon) {
-    icon.textContent = '🔓';
+    icon.innerHTML = renderLockSvg(true);
     icon.title = 'Unlocked';
   }
 
@@ -332,15 +350,10 @@ function renderQuests() {
     const icon = document.getElementById(iconId);
     if (!card || !icon) return;
 
-    if (state.quests && state.quests[key]) {
-      card.classList.add('is-unlocked');
-      icon.textContent = '🔓';
-      icon.title = 'Unlocked';
-    } else {
-      card.classList.remove('is-unlocked');
-      icon.textContent = '🔒';
-      icon.title = 'Locked';
-    }
+    const isUnlocked = Boolean(state.quests && state.quests[key]);
+    card.classList.toggle('is-unlocked', isUnlocked);
+    icon.innerHTML = renderLockSvg(isUnlocked);
+    icon.title = isUnlocked ? 'Unlocked' : 'Locked';
   });
 }
 
@@ -732,6 +745,11 @@ function castCurse() {
     return;
   }
 
+  // Dynamically start battle on first attack engagement if standby
+  if (!state.battleStarted && state.active) {
+    engageBattle();
+  }
+
   AudioSynth.play('cast');
   state.red.cast += 1;
 
@@ -849,6 +867,11 @@ function addWard(ruleText) {
     return;
   }
 
+  // Dynamically start battle on first defense engagement if standby
+  if (!state.battleStarted && state.active) {
+    engageBattle();
+  }
+
   // Ensure prefix if standard substring
   let rule = val;
   const isPrefixed = rule.toLowerCase().startsWith('block:') ||
@@ -889,9 +912,64 @@ function addWard(ruleText) {
   }
 }
 
-// 10. ROUND TIMER
+// 10. DYNAMIC BATTLE ENGAGEMENT & ROUND TIMER
 let timerInterval = null;
 let timeLeft = 120;
+
+function renderTimerDisplay() {
+  const timerEl = $('#roundTimer');
+  if (timerEl) {
+    timerEl.textContent = formatTime(timeLeft);
+    if (!state.battleStarted) {
+      timerEl.classList.add('is-paused');
+    } else {
+      timerEl.classList.remove('is-paused');
+    }
+  }
+
+  const statusPill = $('#battleStatusPill');
+  const startBtn = $('#startBattleBtn');
+
+  if (statusPill) {
+    if (!state.active) {
+      statusPill.textContent = 'ROUND COMPLETE';
+      statusPill.classList.remove('is-active', 'is-standby');
+    } else if (state.battleStarted) {
+      statusPill.textContent = '● ACTIVE MIDNIGHT CURSE';
+      statusPill.classList.remove('is-standby');
+      statusPill.classList.add('is-active');
+    } else {
+      statusPill.textContent = 'STANDBY • READY';
+      statusPill.classList.remove('is-active');
+      statusPill.classList.add('is-standby');
+    }
+  }
+
+  if (startBtn) {
+    if (!state.active) {
+      startBtn.textContent = 'ROUND ENDED';
+      startBtn.classList.add('is-engaged');
+    } else if (state.battleStarted) {
+      startBtn.textContent = '⚔️ ENGAGED';
+      startBtn.classList.add('is-engaged');
+    } else {
+      startBtn.textContent = '▶ ENGAGE BATTLE';
+      startBtn.classList.remove('is-engaged');
+    }
+  }
+}
+
+function engageBattle() {
+  if (state.battleStarted || !state.active) return;
+  state.battleStarted = true;
+
+  renderTimerDisplay();
+
+  pushFeed('system', `⚔️ BATTLE COMMENCED: Combat timers engaged! Round ${state.round} is live.`);
+  AudioSynth.play('breach');
+
+  startTimer();
+}
 
 function startTimer() {
   if (timerInterval) clearInterval(timerInterval);
@@ -913,11 +991,14 @@ function startTimer() {
 function endRound(reason) {
   if (!state.active) return;
   state.active = false;
+  state.battleStarted = false;
 
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
   }
+
+  renderTimerDisplay();
 
   let winner = 'DRAW';
   if (reason === 'red') {
@@ -991,6 +1072,19 @@ function showRoundOverlay(winner) {
 
 function startNextRound() {
   state.round += 1;
+  state.battleStarted = false;
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  // Set timeLeft based on active difficulty setting
+  if (state.difficulty === 'easy') timeLeft = 180;
+  else if (state.difficulty === 'medium') timeLeft = 120;
+  else if (state.difficulty === 'hard') timeLeft = 90;
+  else if (state.difficulty === 'nightmare') timeLeft = 60;
+  else timeLeft = 120;
+
   state.red = { score: 0, cast: 0, hits: 0, health: 100, surgeActive: false };
   state.blue = {
     score: 0,
@@ -1007,7 +1101,8 @@ function startNextRound() {
   state.feed = [];
   state.selectedCurse = null;
   state.active = true;
-  timeLeft = 120;
+  state.consecutiveBlocks = 0;
+  state.payloadWasMutated = false;
 
   // Re-enable buttons
   ['#castBtn', '#wardBtn', '#clearBtn', '#purgeBtn'].forEach((sel) => {
@@ -1023,9 +1118,9 @@ function startNextRound() {
   renderFeed();
   renderQuests();
   renderChronologyRail();
+  renderTimerDisplay();
 
-  pushFeed('system', `Round ${state.round} begins. Both butlers awakened.`);
-  startTimer();
+  pushFeed('system', `Round ${state.round} prepared. Both butlers awakened. Standby for engagement.`);
 }
 
 // 12. EMBER PARTICLE CANVAS SYSTEM
@@ -1351,10 +1446,24 @@ function init() {
       } else if (val === 'nightmare') {
         timeLeft = 60;
       }
-      const timerEl = $('#roundTimer');
-      if (timerEl) timerEl.textContent = formatTime(timeLeft);
+      renderTimerDisplay();
       pushFeed('system', `Difficulty changed to ${val.toUpperCase()} (${timeLeft}s limit).`);
       AudioSynth.play('toggle');
+    });
+  }
+
+  // Dynamic Battle Engagement Controls
+  const startBattleBtn = $('#startBattleBtn');
+  if (startBattleBtn) {
+    startBattleBtn.addEventListener('click', () => {
+      engageBattle();
+    });
+  }
+
+  const battleStatusPill = $('#battleStatusPill');
+  if (battleStatusPill) {
+    battleStatusPill.addEventListener('click', () => {
+      engageBattle();
     });
   }
 
@@ -1404,7 +1513,7 @@ function init() {
   }
 
   // First Welcome Feed Entry
-  pushFeed('system', 'Round 1 begins. Both butlers awakened. Security protocols online.');
+  pushFeed('system', 'Round 1 loaded. Both butlers awakened. Security protocols online. Awaiting battle engagement.');
 
   // Initialize Particle Canvas
   initEmberCanvas();
@@ -1429,9 +1538,7 @@ function init() {
   renderProtocols();
   renderQuests();
   renderChronologyRail();
-
-  // Start Countdown Timer
-  startTimer();
+  renderTimerDisplay();
 }
 
 // Run on load

@@ -88,9 +88,10 @@
       </div>
     </div>
 
-    <div class="round-banner">
-      <span class="pulse-pill" aria-label="Round Status">ACTIVE MIDNIGHT CURSE</span>
-      <div class="round-timer" id="roundTimer" aria-label="Round Timer">02:00</div>
+    <div class="round-banner" id="roundBanner">
+      <span class="pulse-pill is-standby" id="battleStatusPill" aria-label="Round Status">STANDBY • READY</span>
+      <button id="startBattleBtn" class="btn-start-battle" type="button" aria-label="Engage Battle">▶ ENGAGE BATTLE</button>
+      <div class="round-timer is-paused" id="roundTimer" aria-label="Round Timer">02:00</div>
     </div>
 
     <div class="header-actions">
@@ -194,7 +195,14 @@
         <article class="quest-card" id="questCard1" data-quest="first-breach">
           <div class="quest-card__top">
             <span class="quest-tag">QUEST 01</span>
-            <span class="quest-status-icon" id="questIcon1" title="Locked">🔒</span>
+            <span class="quest-status-icon" id="questIcon1" title="Locked">
+              <svg class="quest-lock-svg is-locked" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <rect x="4" y="11" width="16" height="11" rx="2.5" fill="rgba(196, 113, 237, 0.16)" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+                <path d="M12 17.5v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </span>
           </div>
           <h3 class="quest-name">First Injection</h3>
           <p class="quest-rule">Breach The Warden's defense with any unblocked curse payload.</p>
@@ -204,7 +212,14 @@
         <article class="quest-card" id="questCard2" data-quest="stealth-cloak">
           <div class="quest-card__top">
             <span class="quest-tag">QUEST 02</span>
-            <span class="quest-status-icon" id="questIcon2" title="Locked">🔒</span>
+            <span class="quest-status-icon" id="questIcon2" title="Locked">
+              <svg class="quest-lock-svg is-locked" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <rect x="4" y="11" width="16" height="11" rx="2.5" fill="rgba(196, 113, 237, 0.16)" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+                <path d="M12 17.5v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </span>
           </div>
           <h3 class="quest-name">Phantom Cloak</h3>
           <p class="quest-rule">Mutate a curse payload using Base64 or Leet-Evade encoding.</p>
@@ -214,7 +229,14 @@
         <article class="quest-card" id="questCard3" data-quest="iron-citadel">
           <div class="quest-card__top">
             <span class="quest-tag">QUEST 03</span>
-            <span class="quest-status-icon" id="questIcon3" title="Locked">🔒</span>
+            <span class="quest-status-icon" id="questIcon3" title="Locked">
+              <svg class="quest-lock-svg is-locked" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <rect x="4" y="11" width="16" height="11" rx="2.5" fill="rgba(196, 113, 237, 0.16)" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+                <path d="M12 17.5v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </span>
           </div>
           <h3 class="quest-name">Iron Citadel</h3>
           <p class="quest-rule">Successfully block 2 consecutive incoming attack curses with active wards.</p>
@@ -224,7 +246,14 @@
         <article class="quest-card" id="questCard4" data-quest="midnight-critical">
           <div class="quest-card__top">
             <span class="quest-tag">QUEST 04</span>
-            <span class="quest-status-icon" id="questIcon4" title="Locked">🔒</span>
+            <span class="quest-status-icon" id="questIcon4" title="Locked">
+              <svg class="quest-lock-svg is-locked" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <rect x="4" y="11" width="16" height="11" rx="2.5" fill="rgba(196, 113, 237, 0.16)" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+                <path d="M12 17.5v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </span>
           </div>
           <h3 class="quest-name">Midnight Critical</h3>
           <p class="quest-rule">Land a successful breach while Ecto-Surge Overdrive is primed.</p>
