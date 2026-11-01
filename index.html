@@ -122,26 +122,9 @@
           <h2 class="console-title">CURSE INJECTION</h2>
         </div>
 
-        <!-- Attack Vector Tabs -->
-        <div class="vector-tabs" role="tablist" aria-label="Curse Categories">
-          <button class="vector-tab is-active" data-cat="injections" type="button" role="tab" aria-selected="true">INJECTIONS</button>
-          <button class="vector-tab" data-cat="evasion" type="button" role="tab" aria-selected="false">STEALTH &amp; EVASION</button>
-          <button class="vector-tab" data-cat="social" type="button" role="tab" aria-selected="false">SOCIAL ENG</button>
-          <button class="vector-tab" data-cat="denial" type="button" role="tab" aria-selected="false">DENIAL &amp; GLITCH</button>
-        </div>
-
-        <!-- Dynamic Curse Palette -->
+        <!-- Dynamic Curse Palette (Clean Primary View) -->
         <div class="curse-palette" id="cursePalette" role="group" aria-label="Preset Curse Payloads">
           <!-- Populated by JS based on active tab -->
-        </div>
-
-        <!-- Attack Mutators Toolbar -->
-        <div class="mutators-toolbar" role="toolbar" aria-label="Attack Payload Mutators">
-          <span class="toolbar-label">MUTATORS:</span>
-          <button id="mutatorBase64" class="btn-mutator" type="button" title="Encode entire payload into Base64 format">[⚡ BASE64]</button>
-          <button id="mutatorLeet" class="btn-mutator" type="button" title="Convert keywords into Leetspeak to evade string filters">[🔤 LEET-EVADE]</button>
-          <button id="mutatorSuffix" class="btn-mutator" type="button" title="Append adversarial jailbreak suffix">[🔮 ADVERSARIAL SUFFIX]</button>
-          <button id="mutatorCaps" class="btn-mutator" type="button" title="Uppercase scream payload to stress boundary filters">[🔠 SCREAM]</button>
         </div>
 
         <div class="form-group">
@@ -149,14 +132,40 @@
           <textarea id="payloadInput" class="payload-input" placeholder="Type or mutate your curse payload..." aria-label="Custom curse payload input"></textarea>
         </div>
 
-        <!-- Attack Powerup Toggle -->
-        <div class="powerup-row">
-          <label class="power-toggle" for="ectoSurgeToggle">
-            <input type="checkbox" id="ectoSurgeToggle">
-            <span class="toggle-slider"></span>
-            <span class="toggle-text">⚡ ECTO-SURGE (+15 DMG, 35 TOTAL CRITICAL)</span>
-          </label>
-        </div>
+        <!-- Collapsible Advanced Arsenal Drawer -->
+        <details class="advanced-drawer" id="attackDrawer">
+          <summary class="drawer-summary">
+            <span>⚙ ADVANCED ARSENAL &amp; MUTATORS</span>
+            <span class="drawer-arrow">▾</span>
+          </summary>
+          <div class="drawer-content">
+            <!-- Attack Vector Tabs -->
+            <div class="vector-tabs" role="tablist" aria-label="Curse Categories">
+              <button class="vector-tab is-active" data-cat="injections" type="button" role="tab" aria-selected="true">INJECTIONS</button>
+              <button class="vector-tab" data-cat="evasion" type="button" role="tab" aria-selected="false">STEALTH &amp; EVASION</button>
+              <button class="vector-tab" data-cat="social" type="button" role="tab" aria-selected="false">SOCIAL ENG</button>
+              <button class="vector-tab" data-cat="denial" type="button" role="tab" aria-selected="false">DENIAL &amp; GLITCH</button>
+            </div>
+
+            <!-- Attack Mutators Toolbar -->
+            <div class="mutators-toolbar" role="toolbar" aria-label="Attack Payload Mutators">
+              <span class="toolbar-label">MUTATORS:</span>
+              <button id="mutatorBase64" class="btn-mutator" type="button" title="Encode entire payload into Base64 format">[⚡ BASE64]</button>
+              <button id="mutatorLeet" class="btn-mutator" type="button" title="Convert keywords into Leetspeak to evade string filters">[🔤 LEET-EVADE]</button>
+              <button id="mutatorSuffix" class="btn-mutator" type="button" title="Append adversarial jailbreak suffix">[🔮 ADVERSARIAL SUFFIX]</button>
+              <button id="mutatorCaps" class="btn-mutator" type="button" title="Uppercase scream payload to stress boundary filters">[🔠 SCREAM]</button>
+            </div>
+
+            <!-- Attack Powerup Toggle -->
+            <div class="powerup-row">
+              <label class="power-toggle" for="ectoSurgeToggle">
+                <input type="checkbox" id="ectoSurgeToggle">
+                <span class="toggle-slider"></span>
+                <span class="toggle-text">⚡ ECTO-SURGE (+15 DMG, 35 TOTAL CRITICAL)</span>
+              </label>
+            </div>
+          </div>
+        </details>
 
         <div class="button-row">
           <button id="castBtn" class="btn btn--attack btn--lg" type="button" aria-label="Cast Curse Payload">CAST CURSE</button>
@@ -171,55 +180,7 @@
           <h2 class="console-title">WARD ENGINE</h2>
         </div>
 
-        <!-- Active Security Protocols (Firewalls) -->
-        <div class="protocols-panel" aria-label="Defensive Security Protocols">
-          <div class="protocols-title">
-            <span>DEFENSIVE PROTOCOLS</span>
-            <span class="protocols-badge" id="protocolStatusBadge">2/3 ONLINE</span>
-          </div>
-          <div class="protocols-grid">
-            <label class="protocol-card is-active" for="protoSanitizer">
-              <input type="checkbox" id="protoSanitizer" checked>
-              <div class="protocol-info">
-                <span class="protocol-name">Sanitizer Firewall</span>
-                <span class="protocol-desc">Normalizes leetspeak &amp; symbols before ward scan</span>
-              </div>
-              <span class="protocol-status">ACTIVE</span>
-            </label>
-
-            <label class="protocol-card is-active" for="protoBase64">
-              <input type="checkbox" id="protoBase64" checked>
-              <div class="protocol-info">
-                <span class="protocol-name">Base64 Inspector</span>
-                <span class="protocol-desc">Decodes and scans obscured base64 injections</span>
-              </div>
-              <span class="protocol-status">ACTIVE</span>
-            </label>
-
-            <label class="protocol-card" for="protoEctoShield">
-              <input type="checkbox" id="protoEctoShield">
-              <div class="protocol-info">
-                <span class="protocol-name">Ecto-Shield</span>
-                <span class="protocol-desc">Absorbs 50% breach damage (takes 10 HP instead of 20)</span>
-              </div>
-              <span class="protocol-status">STANDBY</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Quick Ward Presets -->
-        <div class="quick-wards" role="group" aria-label="Quick Ward Presets">
-          <span class="quick-wards-label">QUICK WARDS:</span>
-          <button class="quick-ward-chip" data-ward="block:ignore" type="button">+ ignore</button>
-          <button class="quick-ward-chip" data-ward="block:system prompt" type="button">+ system prompt</button>
-          <button class="quick-ward-chip" data-ward="block:secret" type="button">+ secret</button>
-          <button class="quick-ward-chip" data-ward="block:override" type="button">+ override</button>
-          <button class="quick-ward-chip" data-ward="block:maintenance" type="button">+ maintenance</button>
-          <button class="quick-ward-chip" data-ward="limit:90" type="button">+ limit:90</button>
-          <button class="quick-ward-chip" data-ward="regex:[0-9a-f]{8,}" type="button">+ regex:hex-token</button>
-        </div>
-
-        <!-- Wards list will be populated dynamically by JS with starter wards -->
+        <!-- Wards list (Clean Primary View) -->
         <div class="ward-list" id="wardList" role="region" aria-label="Active Defense Wards">
           <!-- Populated by JS -->
         </div>
@@ -228,6 +189,63 @@
           <label for="wardInput" class="form-label">Add a ward rule (block:..., limit:..., regex:...):</label>
           <input id="wardInput" class="ward-input" placeholder="e.g. block:ignore, limit:90, regex:admin|root" aria-label="New ward rule definition" />
         </div>
+
+        <!-- Collapsible Advanced Protocols & Quick Wards Drawer -->
+        <details class="advanced-drawer" id="defenseDrawer">
+          <summary class="drawer-summary">
+            <span>⚙ PROTOCOLS &amp; QUICK WARDS</span>
+            <span class="drawer-arrow">▾</span>
+          </summary>
+          <div class="drawer-content">
+            <!-- Active Security Protocols (Firewalls) -->
+            <div class="protocols-panel" aria-label="Defensive Security Protocols">
+              <div class="protocols-title">
+                <span>DEFENSIVE PROTOCOLS</span>
+                <span class="protocols-badge" id="protocolStatusBadge">2/3 ONLINE</span>
+              </div>
+              <div class="protocols-grid">
+                <label class="protocol-card is-active" for="protoSanitizer">
+                  <input type="checkbox" id="protoSanitizer" checked>
+                  <div class="protocol-info">
+                    <span class="protocol-name">Sanitizer Firewall</span>
+                    <span class="protocol-desc">Normalizes leetspeak &amp; symbols before ward scan</span>
+                  </div>
+                  <span class="protocol-status">ACTIVE</span>
+                </label>
+
+                <label class="protocol-card is-active" for="protoBase64">
+                  <input type="checkbox" id="protoBase64" checked>
+                  <div class="protocol-info">
+                    <span class="protocol-name">Base64 Inspector</span>
+                    <span class="protocol-desc">Decodes and scans obscured base64 injections</span>
+                  </div>
+                  <span class="protocol-status">ACTIVE</span>
+                </label>
+
+                <label class="protocol-card" for="protoEctoShield">
+                  <input type="checkbox" id="protoEctoShield">
+                  <div class="protocol-info">
+                    <span class="protocol-name">Ecto-Shield</span>
+                    <span class="protocol-desc">Absorbs 50% breach damage (takes 10 HP instead of 20)</span>
+                  </div>
+                  <span class="protocol-status">STANDBY</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Quick Ward Presets -->
+            <div class="quick-wards" role="group" aria-label="Quick Ward Presets">
+              <span class="quick-wards-label">QUICK WARDS:</span>
+              <button class="quick-ward-chip" data-ward="block:ignore" type="button">+ ignore</button>
+              <button class="quick-ward-chip" data-ward="block:system prompt" type="button">+ system prompt</button>
+              <button class="quick-ward-chip" data-ward="block:secret" type="button">+ secret</button>
+              <button class="quick-ward-chip" data-ward="block:override" type="button">+ override</button>
+              <button class="quick-ward-chip" data-ward="block:maintenance" type="button">+ maintenance</button>
+              <button class="quick-ward-chip" data-ward="limit:90" type="button">+ limit:90</button>
+              <button class="quick-ward-chip" data-ward="regex:[0-9a-f]{8,}" type="button">+ regex:hex-token</button>
+            </div>
+          </div>
+        </details>
 
         <div class="button-row">
           <button id="wardBtn" class="btn btn--defend btn--lg" type="button" aria-label="Engage Ward Rule">ENGAGE WARD</button>

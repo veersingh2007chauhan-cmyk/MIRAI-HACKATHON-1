@@ -625,6 +625,87 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--blue);
 }
 
+.attack-console {
+  border-top: 3px solid var(--red) !important;
+  box-shadow: inset 0 3px 12px -4px var(--red-glow);
+}
+
+.defense-console {
+  border-top: 3px solid var(--blue) !important;
+  box-shadow: inset 0 3px 12px -4px var(--blue-glow);
+}
+
+/* Collapsible Advanced Drawers (Progressive Disclosure) */
+.advanced-drawer {
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  margin: 0.75rem 0;
+  background: rgba(255, 255, 255, 0.015);
+  transition: border-color var(--dur-fast), background var(--dur-fast);
+}
+
+.advanced-drawer[open] {
+  background: rgba(255, 255, 255, 0.025);
+  border-color: rgba(240, 180, 41, 0.35);
+}
+
+.drawer-summary {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+  transition: color var(--dur-fast), background var(--dur-fast);
+}
+
+.drawer-summary::-webkit-details-marker {
+  display: none;
+}
+
+.drawer-summary:hover {
+  color: var(--amber);
+  background: rgba(240, 180, 41, 0.05);
+}
+
+.drawer-summary:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: -2px;
+}
+
+.drawer-arrow {
+  font-size: 0.75rem;
+  transition: transform var(--dur-fast);
+  color: var(--amber);
+}
+
+.advanced-drawer[open] .drawer-arrow {
+  transform: rotate(180deg);
+}
+
+.drawer-content {
+  padding: 0.75rem;
+  border-top: 1px solid var(--border);
+  animation: drawer-in 220ms ease-out;
+}
+
+@keyframes drawer-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Curse Palette & Vector Tabs */
 .vector-tabs {
   display: flex;
