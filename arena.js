@@ -1539,6 +1539,175 @@ function init() {
   renderQuests();
   renderChronologyRail();
   renderTimerDisplay();
+
+  // Initialize Sidebar Navigation
+  initNavigation();
+}
+
+// 14. MULTI-PAGE NAVIGATION & LEADERBOARD SYSTEM
+function initNavigation() {
+  const navBtns = $$('.nav-item');
+  const viewPanels = $$('.view-panel');
+
+  navBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetView = btn.dataset.view;
+      if (!targetView) return;
+
+      navBtns.forEach((b) => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+
+      viewPanels.forEach((panel) => {
+        panel.classList.remove('is-active');
+      });
+
+      const targetId = `view${targetView.charAt(0).toUpperCase() + targetView.slice(1)}`;
+      const activePanel = document.getElementById(targetId);
+      if (activePanel) {
+        activePanel.classList.add('is-active');
+      }
+
+      if (targetView === 'leaderboard') {
+        renderLeaderboardView();
+      }
+
+      AudioSynth.play('toggle');
+    });
+  });
+
+  const jumpCombatBtn = $('#leadJumpCombatBtn');
+  if (jumpCombatBtn) {
+    jumpCombatBtn.addEventListener('click', () => {
+      const liveBtn = $('#navLive');
+      if (liveBtn) liveBtn.click();
+      const panel = $('#combatPanel');
+      if (panel) {
+        setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+      }
+    });
+  }
+
+  // Settings View Handlers
+  const settingsDiff = $('#settingsDifficultySelect');
+  if (settingsDiff) {
+    settingsDiff.addEventListener('change', (e) => {
+      const diffSelect = $('#difficultySelect');
+      if (diffSelect) {
+        diffSelect.value = e.target.value;
+        diffSelect.dispatchEvent(new Event('change'));
+      }
+    });
+  }
+
+  const settingsSaveTeamsBtn = $('#settingsSaveTeamsBtn');
+  if (settingsSaveTeamsBtn) {
+    settingsSaveTeamsBtn.addEventListener('click', () => {
+      const redIn = $('#settingsRedInput');
+      const blueIn = $('#settingsBlueInput');
+      if (redIn && redIn.value.trim()) state.redName = redIn.value.trim();
+      if (blueIn && blueIn.value.trim()) state.blueName = blueIn.value.trim();
+      renderScores();
+      pushFeed('system', `Teams customized from settings: ${state.redName} vs ${state.blueName}`);
+      AudioSynth.play('ward');
+    });
+  }
+
+  const settingsSoundBtn = $('#settingsSoundBtn');
+  if (settingsSoundBtn) {
+    settingsSoundBtn.addEventListener('click', () => {
+      const soundBtn = $('#soundToggleBtn');
+      if (soundBtn) soundBtn.click();
+      settingsSoundBtn.textContent = state.soundEnabled ? '🔊 SFX: ON' : '🔇 SFX: OFF';
+    });
+  }
+
+  const settingsEmbersBtn = $('#settingsEmbersBtn');
+  if (settingsEmbersBtn) {
+    settingsEmbersBtn.addEventListener('click', () => {
+      const canvas = document.getElementById('emberCanvas');
+      if (canvas) {
+        const isHidden = canvas.style.display === 'none';
+        canvas.style.display = isHidden ? 'block' : 'none';
+        settingsEmbersBtn.textContent = isHidden ? '✨ PARTICLES: ON' : '✨ PARTICLES: OFF';
+        AudioSynth.play('toggle');
+      }
+    });
+  }
+
+  const settingsExportBtn = $('#settingsExportBtn');
+  if (settingsExportBtn) {
+    settingsExportBtn.addEventListener('click', () => {
+      const exportBtn = $('#exportLogBtn');
+      if (exportBtn) exportBtn.click();
+    });
+  }
+
+  const settingsResetBtn = $('#settingsResetBtn');
+  if (settingsResetBtn) {
+    settingsResetBtn.addEventListener('click', () => {
+      const resetBtn = $('#resetBtn');
+      if (resetBtn) resetBtn.click();
+    });
+  }
+}
+
+function renderLeaderboardView() {
+  const redScore = $('#leadRedScore');
+  const blueScore = $('#leadBlueScore');
+  const redCast = $('#leadRedCast');
+  const redHits = $('#leadRedHits');
+  const redAcc = $('#leadRedAcc');
+  const redHp = $('#leadRedHp');
+
+  const blueCast = $('#leadBlueCast');
+  const blueHits = $('#leadBlueHits');
+  const blueAcc = $('#leadBlueAcc');
+  const blueHp = $('#leadBlueHp');
+
+  const roundStatus = $('#leadRoundStatus');
+  const timerReadout = $('#leadTimerReadout');
+
+  if (redScore) redScore.textContent = state.red.score;
+  if (blueScore) blueScore.textContent = state.blue.score;
+  if (redCast) redCast.textContent = state.red.cast;
+  if (redHits) redHits.textContent = state.red.hits;
+  if (redAcc) redAcc.textContent = (state.red.cast ? Math.round((state.red.hits / state.red.cast) * 100) : 0) + '%';
+  if (redHp) redHp.textContent = Math.max(0, state.red.health) + ' HP';
+
+  if (blueCast) blueCast.textContent = state.blue.cast;
+  if (blueHits) blueHits.textContent = state.blue.hits;
+  const totalIncoming = state.blue.hits + state.red.hits;
+  if (blueAcc) blueAcc.textContent = (totalIncoming ? Math.round((state.blue.hits / totalIncoming) * 100) : 0) + '%';
+  if (blueHp) blueHp.textContent = Math.max(0, state.blue.health) + ' HP';
+
+  if (roundStatus) {
+    roundStatus.textContent = state.active
+      ? (state.battleStarted ? `ROUND ${state.round} IN PROGRESS` : `ROUND ${state.round} STANDBY`)
+      : `ROUND ${state.round} COMPLETED`;
+  }
+  if (timerReadout) timerReadout.textContent = formatTime(timeLeft);
+
+  // Populate Telemetry Table
+  const tbody = $('#leadTelemetryBody');
+  if (tbody) {
+    tbody.innerHTML = '';
+    const recent = state.feed.slice(0, 8);
+    if (recent.length === 0) {
+      tbody.innerHTML = '<div style="padding: 1rem; color: var(--text-dim); text-align: center;">No combat telemetry logged yet.</div>';
+    } else {
+      recent.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'telemetry-row';
+        row.innerHTML = `
+          <span style="font-family: var(--font-mono); color: var(--text-dim);">${item.time}</span>
+          <span style="color: ${item.type === 'attack' ? 'var(--red)' : item.type === 'defense' ? 'var(--blue)' : 'var(--amber)'}; font-weight: 600;">${item.badge}</span>
+          <span style="color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(item.message)}</span>
+          <span style="font-family: var(--font-mono); color: ${item.type === 'attack' ? 'var(--red)' : 'var(--blue)'};">${item.type.toUpperCase()}</span>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+  }
 }
 
 // Run on load
