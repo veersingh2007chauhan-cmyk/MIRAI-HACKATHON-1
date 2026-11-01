@@ -115,6 +115,12 @@ function animateNumber(el, from, to, dur = 400) {
     el.textContent = to;
     return;
   }
+
+  if (to > from) {
+    el.classList.add('score-pulse');
+    setTimeout(() => el.classList.remove('score-pulse'), 350);
+  }
+
   const startTime = performance.now();
   function tick(now) {
     const elapsed = now - startTime;
@@ -271,6 +277,24 @@ function renderHealth() {
     blueFill.style.width = `${blueH}%`;
     blueFill.classList.toggle('is-low', blueH > 25 && blueH <= 50);
     blueFill.classList.toggle('is-critical', blueH <= 25);
+  }
+
+  // Butler Mood Indicators
+  const redMoodEl = $('#redMood');
+  const blueMoodEl = $('#blueMood');
+
+  if (blueMoodEl) {
+    const bh = state.blue.health;
+    if (bh <= 0) blueMoodEl.textContent = '☠️';
+    else if (bh <= 25) blueMoodEl.textContent = '💀';
+    else if (bh <= 70) blueMoodEl.textContent = '😰';
+    else blueMoodEl.textContent = '🛡️';
+  }
+
+  if (redMoodEl) {
+    if (state.red.score >= 4 || state.red.surgeActive) redMoodEl.textContent = '🔥';
+    else if (state.red.hits > 0) redMoodEl.textContent = '😈';
+    else redMoodEl.textContent = '🤖';
   }
 }
 
@@ -682,6 +706,13 @@ function castCurse() {
     if (blueCard) {
       blueCard.classList.add('shake');
       setTimeout(() => blueCard.classList.remove('shake'), 500);
+
+      // Spawn floating damage text
+      const floatDmg = document.createElement('span');
+      floatDmg.className = 'dmg-float';
+      floatDmg.textContent = `-${damage} HP`;
+      blueCard.appendChild(floatDmg);
+      setTimeout(() => floatDmg.remove(), 850);
     }
 
     renderScores();
