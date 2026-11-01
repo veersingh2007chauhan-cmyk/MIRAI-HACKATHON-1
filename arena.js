@@ -27,6 +27,9 @@ const state = {
   activeVectorTab: 'injections',
   soundEnabled: true,
   feedFilter: 'all',
+  redName: 'RED TEAM',
+  blueName: 'BLUE TEAM',
+  difficulty: 'medium',
   wards: [
     { id: 1, rule: 'block:ignore previous instructions' },
     { id: 2, rule: 'block:you are now' },
@@ -259,6 +262,11 @@ function renderScores() {
   if (roundBadgeEl) {
     roundBadgeEl.textContent = `ROUND ${state.round} / ${state.maxRounds}`;
   }
+
+  const redLabel = $('#redTeamLabel');
+  const blueLabel = $('#blueTeamLabel');
+  if (redLabel) redLabel.textContent = state.redName;
+  if (blueLabel) blueLabel.textContent = state.blueName;
 }
 
 function renderHealth() {
@@ -819,13 +827,13 @@ function endRound(reason) {
 
   let winner = 'DRAW';
   if (reason === 'red') {
-    winner = 'RED TEAM';
+    winner = state.redName;
   } else if (reason === 'blue') {
-    winner = 'BLUE TEAM';
+    winner = state.blueName;
   } else if (state.red.score > state.blue.score) {
-    winner = 'RED TEAM';
+    winner = state.redName;
   } else if (state.blue.score > state.red.score) {
-    winner = 'BLUE TEAM';
+    winner = state.blueName;
   } else {
     winner = 'DRAW';
   }
@@ -848,9 +856,9 @@ function showRoundOverlay(winner) {
   const isFinalMatch = state.round >= state.maxRounds;
 
   let winnerClass = 'is-draw';
-  if (winner.includes('RED')) {
+  if (winner === state.redName) {
     winnerClass = 'is-red';
-  } else if (winner.includes('BLUE')) {
+  } else if (winner === state.blueName) {
     winnerClass = 'is-blue';
   }
 
@@ -862,9 +870,9 @@ function showRoundOverlay(winner) {
       <div class="round-overlay__eyebrow">${isFinalMatch ? 'MATCH FINISHED' : `ROUND ${state.round} COMPLETE`}</div>
       <h2 class="round-overlay__winner ${winnerClass}">${winner === 'DRAW' ? 'STALEMATE' : `${winner} WINS`}</h2>
       <div class="round-overlay__scores">
-        <span class="score-red">RED ${state.red.score}</span>
+        <span class="score-red">${escapeHtml(state.redName)}: ${state.red.score}</span>
         <span class="score-divider">/</span>
-        <span class="score-blue">BLUE ${state.blue.score}</span>
+        <span class="score-blue">${escapeHtml(state.blueName)}: ${state.blue.score}</span>
       </div>
       <button id="nextRoundBtn" class="btn btn--attack btn--lg" type="button">
         ${isFinalMatch ? 'PLAY AGAIN' : 'NEXT ROUND'}
@@ -1094,6 +1102,124 @@ function init() {
   if (endBtn) {
     endBtn.addEventListener('click', () => {
       endRound('manual');
+    });
+  }
+
+  // Team Name Dialog Handlers
+  const teamDialog = $('#teamDialog');
+  const teamNameBtn = $('#teamNameBtn');
+  const saveTeamsBtn = $('#saveTeamsBtn');
+  const closeTeamsBtn = $('#closeTeamsBtn');
+  const redNameInput = $('#redNameInput');
+  const blueNameInput = $('#blueNameInput');
+
+  if (teamNameBtn && teamDialog) {
+    teamNameBtn.addEventListener('click', () => {
+      if (redNameInput) redNameInput.value = state.redName;
+      if (blueNameInput) blueNameInput.value = state.blueName;
+      if (typeof teamDialog.showModal === 'function') {
+        teamDialog.showModal();
+      } else {
+        teamDialog.setAttribute('open', '');
+      }
+      AudioSynth.play('toggle');
+    });
+  }
+
+  if (closeTeamsBtn && teamDialog) {
+    closeTeamsBtn.addEventListener('click', () => {
+      if (typeof teamDialog.close === 'function') {
+        teamDialog.close();
+      } else {
+        teamDialog.removeAttribute('open');
+      }
+      AudioSynth.play('toggle');
+    });
+  }
+
+  if (saveTeamsBtn && teamDialog) {
+    saveTeamsBtn.addEventListener('click', () => {
+      if (redNameInput && redNameInput.value.trim()) {
+        state.redName = redNameInput.value.trim();
+      }
+      if (blueNameInput && blueNameInput.value.trim()) {
+        state.blueName = blueNameInput.value.trim();
+      }
+      renderScores();
+      pushFeed('system', `Teams customized: ${state.redName} vs ${state.blueName}`);
+      if (typeof teamDialog.close === 'function') {
+        teamDialog.close();
+      } else {
+        teamDialog.removeAttribute('open');
+      }
+      AudioSynth.play('ward');
+    });
+  }
+
+  // Difficulty Selector Handler
+  const diffSelect = $('#difficultySelect');
+  if (diffSelect) {
+    diffSelect.addEventListener('change', (e) => {
+      const val = e.target.value;
+      state.difficulty = val;
+      if (val === 'easy') {
+        timeLeft = 180;
+      } else if (val === 'medium') {
+        timeLeft = 120;
+      } else if (val === 'hard') {
+        timeLeft = 90;
+      } else if (val === 'nightmare') {
+        timeLeft = 60;
+      }
+      const timerEl = $('#roundTimer');
+      if (timerEl) timerEl.textContent = formatTime(timeLeft);
+      pushFeed('system', `Difficulty changed to ${val.toUpperCase()} (${timeLeft}s limit).`);
+      AudioSynth.play('toggle');
+    });
+  }
+
+  // Export Battle Log JSON
+  const exportBtn = $('#exportLogBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      const data = {
+        title: "CURSE 03 — Possessed Butler Adversarial Match",
+        timestamp: new Date().toISOString(),
+        difficulty: state.difficulty,
+        round: state.round,
+        maxRounds: state.maxRounds,
+        redTeam: {
+          name: state.redName,
+          score: state.red.score,
+          cursesCast: state.red.cast,
+          successfulBreaches: state.red.hits
+        },
+        blueTeam: {
+          name: state.blueName,
+          score: state.blue.score,
+          wardsCast: state.blue.cast,
+          successfulBlocks: state.blue.hits,
+          healthRemaining: state.blue.health,
+          activeProtocols: state.blue.protocols
+        },
+        activeWards: state.wards,
+        feedLog: state.feed
+      };
+
+      if (typeof Blob !== 'undefined') {
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `curse03-battle-log-r${state.round}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      pushFeed('system', 'Battle log telemetry exported to JSON.');
+      AudioSynth.play('toggle');
     });
   }
 

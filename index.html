@@ -33,6 +33,13 @@
     </div>
 
     <div class="header-actions">
+      <select id="difficultySelect" class="difficulty-select" aria-label="Game Difficulty">
+        <option value="easy">EASY (180s)</option>
+        <option value="medium" selected>MEDIUM (120s)</option>
+        <option value="hard">HARD (90s)</option>
+        <option value="nightmare">NIGHTMARE (60s)</option>
+      </select>
+      <button id="teamNameBtn" class="btn btn--ghost" type="button" aria-label="Customize Team Names">👥 TEAMS</button>
       <button id="soundToggleBtn" class="btn btn--ghost" type="button" aria-label="Toggle Sound Effects">🔊 SFX ON</button>
       <button id="resetBtn" class="btn btn--ghost" type="button" aria-label="Reset Round">RESET ROUND</button>
       <button id="endBtn" class="btn btn--attack" type="button" aria-label="End Round">END ROUND</button>
@@ -44,7 +51,7 @@
     <!-- 1. SCOREBOARD -->
     <section class="scoreboard" aria-label="Scoreboard">
       <div class="score-card score-card--red">
-        <span class="team-label">RED TEAM</span>
+        <span class="team-label" id="redTeamLabel">RED TEAM</span>
         <span class="score-value" id="redScore">0</span>
         <span class="score-sublabel">ATTACK POINTS</span>
       </div>
@@ -55,7 +62,7 @@
       </div>
 
       <div class="score-card score-card--blue">
-        <span class="team-label">BLUE TEAM</span>
+        <span class="team-label" id="blueTeamLabel">BLUE TEAM</span>
         <span class="score-value" id="blueScore">0</span>
         <span class="score-sublabel">DEFENSE POINTS</span>
       </div>
@@ -280,6 +287,7 @@
           <button class="feed-filter" data-filter="attack" type="button">ATTACKS</button>
           <button class="feed-filter" data-filter="defense" type="button">DEFENSE</button>
           <button class="feed-filter" data-filter="system" type="button">SYSTEM</button>
+          <button id="exportLogBtn" class="feed-filter" type="button" title="Export Battle Log JSON">📥 EXPORT</button>
           <button id="clearFeedBtn" class="feed-clear-btn" type="button" title="Clear Feed">CLEAR</button>
         </div>
       </div>
@@ -291,6 +299,30 @@
       <p class="live-feed__caption">All actions broadcast live to both teams</p>
     </section>
   </main>
+
+  <!-- Team Customization Dialog -->
+  <dialog id="teamDialog" class="team-dialog">
+    <div class="team-dialog__card">
+      <div class="eyebrow" style="color: var(--amber);">COMPETITIVE MATCH CONFIG</div>
+      <h3 class="team-dialog__title">⚔️ CUSTOMIZE TEAMS</h3>
+      <p class="team-dialog__desc">Set custom team designations for this live adversarial round:</p>
+      
+      <div class="form-group" style="text-align: left; width: 100%;">
+        <label for="redNameInput" class="form-label" style="color: var(--red);">Red Team (Attacker):</label>
+        <input id="redNameInput" class="ward-input" value="RED TEAM" maxlength="24" style="caret-color: var(--red);">
+      </div>
+      
+      <div class="form-group" style="text-align: left; width: 100%;">
+        <label for="blueNameInput" class="form-label" style="color: var(--blue);">Blue Team (Defender):</label>
+        <input id="blueNameInput" class="ward-input" value="BLUE TEAM" maxlength="24" style="caret-color: var(--blue);">
+      </div>
+      
+      <div class="button-row" style="width: 100%; justify-content: center; margin-top: 1.25rem;">
+        <button id="saveTeamsBtn" class="btn btn--attack btn--lg" type="button">APPLY TEAMS</button>
+        <button id="closeTeamsBtn" class="btn btn--ghost" type="button">CANCEL</button>
+      </div>
+    </div>
+  </dialog>
 
   <script src="arena.js" defer></script>
 </body>

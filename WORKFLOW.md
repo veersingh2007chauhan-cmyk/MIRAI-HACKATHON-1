@@ -231,3 +231,4 @@ graph LR
 | [`index.html`](file:///Users/veersingh1/possesed%20butler/index.html) | **Arena Markup** | Semantic HTML5 structure for the cyberpunk esports arena HUD. |
 | [`arena.css`](file:///Users/veersingh1/possesed%20butler/arena.css) | **Arena Styling** | Theme variables, animations (shake, beam, pulse), and responsive layouts. |
 | [`arena.js`](file:///Users/veersingh1/possesed%20butler/arena.js) | **Arena Controller** | Audio synthesis, mutator toolbar, protocol switches, and match loop. |
+

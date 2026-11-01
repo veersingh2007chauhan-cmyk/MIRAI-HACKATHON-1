@@ -1645,3 +1645,73 @@ input:focus-visible {
 .round-overlay__scores .score-divider {
   color: var(--text-faint);
 }
+
+/* Difficulty Selector */
+.difficulty-select {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--amber);
+  cursor: pointer;
+  outline: none;
+  transition: all var(--dur-fast);
+}
+
+.difficulty-select:hover,
+.difficulty-select:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 10px rgba(240, 180, 41, 0.25);
+}
+
+.difficulty-select option {
+  background: #0d1117;
+  color: var(--text);
+}
+
+/* Team Customization Modal Dialog */
+.team-dialog {
+  border: none;
+  background: transparent;
+  padding: 0;
+  max-width: 90vw;
+}
+
+.team-dialog::backdrop {
+  background: rgba(5, 5, 8, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.team-dialog__card {
+  background: var(--surface);
+  border: 2px solid var(--amber);
+  border-radius: var(--r-md);
+  padding: 2rem;
+  text-align: center;
+  max-width: 440px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 0 35px rgba(240, 180, 41, 0.35);
+  animation: feed-in 250ms ease-out;
+}
+
+.team-dialog__title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--text);
+  letter-spacing: 0.08em;
+}
+
+.team-dialog__desc {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+}
