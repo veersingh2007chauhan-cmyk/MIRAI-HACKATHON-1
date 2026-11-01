@@ -201,7 +201,7 @@
             <div class="protocols-panel" aria-label="Defensive Security Protocols">
               <div class="protocols-title">
                 <span>DEFENSIVE PROTOCOLS</span>
-                <span class="protocols-badge" id="protocolStatusBadge">2/3 ONLINE</span>
+                <span class="protocols-badge" id="protocolStatusBadge">3/4 ONLINE</span>
               </div>
               <div class="protocols-grid">
                 <label class="protocol-card is-active" for="protoSanitizer">
@@ -218,6 +218,15 @@
                   <div class="protocol-info">
                     <span class="protocol-name">Base64 Inspector</span>
                     <span class="protocol-desc">Decodes and scans obscured base64 injections</span>
+                  </div>
+                  <span class="protocol-status">ACTIVE</span>
+                </label>
+
+                <label class="protocol-card is-active" for="protoHomoglyph">
+                  <input type="checkbox" id="protoHomoglyph" checked>
+                  <div class="protocol-info">
+                    <span class="protocol-name">Homoglyph Normalizer</span>
+                    <span class="protocol-desc">Maps Unicode lookalikes (Ⅰ, А, е, о) to standard ASCII</span>
                   </div>
                   <span class="protocol-status">ACTIVE</span>
                 </label>
@@ -241,6 +250,9 @@
               <button class="quick-ward-chip" data-ward="block:secret" type="button">+ secret</button>
               <button class="quick-ward-chip" data-ward="block:override" type="button">+ override</button>
               <button class="quick-ward-chip" data-ward="block:maintenance" type="button">+ maintenance</button>
+              <button class="quick-ward-chip" data-ward="strip:base64" type="button">+ strip:base64</button>
+              <button class="quick-ward-chip" data-ward="strip:markdown" type="button">+ strip:markdown</button>
+              <button class="quick-ward-chip" data-ward="canary:BUTLER_KEY" type="button">+ canary:BUTLER_KEY</button>
               <button class="quick-ward-chip" data-ward="limit:90" type="button">+ limit:90</button>
               <button class="quick-ward-chip" data-ward="regex:[0-9a-f]{8,}" type="button">+ regex:hex-token</button>
             </div>

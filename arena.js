@@ -16,6 +16,7 @@ const state = {
     protocols: {
       sanitizer: true,
       base64: true,
+      homoglyph: true,
       ectoShield: false
     }
   },
@@ -379,11 +380,13 @@ function renderCurseChips() {
 function renderProtocols() {
   const sanitizerEl = $('#protoSanitizer');
   const base64El = $('#protoBase64');
+  const homoglyphEl = $('#protoHomoglyph');
   const ectoShieldEl = $('#protoEctoShield');
   const badgeEl = $('#protocolStatusBadge');
 
   if (sanitizerEl) sanitizerEl.checked = state.blue.protocols.sanitizer;
   if (base64El) base64El.checked = state.blue.protocols.base64;
+  if (homoglyphEl) homoglyphEl.checked = state.blue.protocols.homoglyph;
   if (ectoShieldEl) ectoShieldEl.checked = state.blue.protocols.ectoShield;
 
   const cards = $$('.protocol-card');
@@ -403,8 +406,9 @@ function renderProtocols() {
     let count = 0;
     if (state.blue.protocols.sanitizer) count++;
     if (state.blue.protocols.base64) count++;
+    if (state.blue.protocols.homoglyph) count++;
     if (state.blue.protocols.ectoShield) count++;
-    badgeEl.textContent = `${count}/3 ONLINE`;
+    badgeEl.textContent = `${count}/4 ONLINE`;
   }
 }
 
@@ -468,10 +472,44 @@ function normalizeLeet(str) {
     .replace(/7/g, 't');
 }
 
+function normalizeHomoglyphs(str) {
+  if (!str) return '';
+  return str
+    .replace(/[\u2160\u0406\u0456]/g, 'i') // Roman numeral I, Cyrillic I
+    .replace(/[\u0410\u0430]/g, 'a') // Cyrillic A
+    .replace(/[\u0412\u0432]/g, 'b')
+    .replace(/[\u0415\u0435]/g, 'e') // Cyrillic E
+    .replace(/[\u041a\u043a]/g, 'k')
+    .replace(/[\u041c\u043c]/g, 'm')
+    .replace(/[\u041d\u043d]/g, 'h')
+    .replace(/[\u041e\u043e]/g, 'o') // Cyrillic O
+    .replace(/[\u0420\u0440]/g, 'p') // Cyrillic P
+    .replace(/[\u0421\u0441]/g, 'c') // Cyrillic C
+    .replace(/[\u0422\u0442]/g, 't')
+    .replace(/[\u0425\u0445]/g, 'x');
+}
+
 const MockButler = {
   // Returns { blocked: bool, matchedWard: string|null, detail: string|null }
   evaluate(payload, wards) {
-    const lower = payload.toLowerCase();
+    let processed = payload;
+
+    // Check pre-processing strip wards
+    const hasStripBase64 = wards.some((w) => w.rule.toLowerCase() === 'strip:base64');
+    const hasStripMarkdown = wards.some((w) => w.rule.toLowerCase() === 'strip:markdown');
+
+    if (hasStripBase64) {
+      processed = processed.replace(/\[BASE64:[A-Za-z0-9+/=]+\]/gi, '').trim();
+    }
+    if (hasStripMarkdown) {
+      processed = processed.replace(/<!--[\s\S]*?-->/gi, '').trim();
+    }
+
+    if (state.blue.protocols.homoglyph) {
+      processed = normalizeHomoglyphs(processed);
+    }
+
+    const lower = processed.toLowerCase();
 
     for (const ward of wards) {
       const rule = ward.rule.trim();
@@ -480,11 +518,11 @@ const MockButler = {
       // Rule Type A: Length limit (e.g. limit:90)
       if (ruleLower.startsWith('limit:')) {
         const maxLen = parseInt(ruleLower.slice(6).trim(), 10);
-        if (!isNaN(maxLen) && payload.length > maxLen) {
+        if (!isNaN(maxLen) && processed.length > maxLen) {
           return {
             blocked: true,
             matchedWard: ward.rule,
-            detail: `Length exceeded (${payload.length} > ${maxLen})`
+            detail: `Length exceeded (${processed.length} > ${maxLen})`
           };
         }
       }
@@ -494,7 +532,7 @@ const MockButler = {
         const pattern = rule.slice(6).trim();
         try {
           const reg = new RegExp(pattern, 'i');
-          if (reg.test(payload)) {
+          if (reg.test(processed)) {
             return {
               blocked: true,
               matchedWard: ward.rule,
@@ -506,7 +544,19 @@ const MockButler = {
         }
       }
 
-      // Rule Type C: Substring Block (e.g. block:ignore)
+      // Rule Type C: Canary Honeypot Token (e.g. canary:BUTLER_KEY)
+      if (ruleLower.startsWith('canary:')) {
+        const token = rule.slice(7).trim().toLowerCase();
+        if (token && lower.includes(token)) {
+          return {
+            blocked: true,
+            matchedWard: ward.rule,
+            detail: 'Canary Honeypot extraction detected'
+          };
+        }
+      }
+
+      // Rule Type D: Substring Block (e.g. block:ignore)
       if (ruleLower.startsWith('block:')) {
         const pattern = ruleLower.slice(6).trim();
         if (!pattern) continue;
@@ -670,7 +720,9 @@ function addWard(ruleText) {
   let rule = val;
   const isPrefixed = rule.toLowerCase().startsWith('block:') ||
                      rule.toLowerCase().startsWith('limit:') ||
-                     rule.toLowerCase().startsWith('regex:');
+                     rule.toLowerCase().startsWith('regex:') ||
+                     rule.toLowerCase().startsWith('strip:') ||
+                     rule.toLowerCase().startsWith('canary:');
   if (!isPrefixed) {
     rule = 'block:' + val;
   }
@@ -812,7 +864,7 @@ function startNextRound() {
     cast: 0,
     hits: 0,
     health: 100,
-    protocols: { sanitizer: true, base64: true, ectoShield: false }
+    protocols: { sanitizer: true, base64: true, homoglyph: true, ectoShield: false }
   };
   state.wards = [
     { id: 1, rule: 'block:ignore previous instructions' },
@@ -903,11 +955,13 @@ function init() {
   // Defense Security Protocol Toggles
   const protoSanitizer = $('#protoSanitizer');
   const protoBase64 = $('#protoBase64');
+  const protoHomoglyph = $('#protoHomoglyph');
   const protoEctoShield = $('#protoEctoShield');
 
   const updateProtocolsFromDom = () => {
     if (protoSanitizer) state.blue.protocols.sanitizer = protoSanitizer.checked;
     if (protoBase64) state.blue.protocols.base64 = protoBase64.checked;
+    if (protoHomoglyph) state.blue.protocols.homoglyph = protoHomoglyph.checked;
     if (protoEctoShield) state.blue.protocols.ectoShield = protoEctoShield.checked;
     renderProtocols();
     AudioSynth.play('toggle');
@@ -915,6 +969,7 @@ function init() {
 
   if (protoSanitizer) protoSanitizer.addEventListener('change', updateProtocolsFromDom);
   if (protoBase64) protoBase64.addEventListener('change', updateProtocolsFromDom);
+  if (protoHomoglyph) protoHomoglyph.addEventListener('change', updateProtocolsFromDom);
   if (protoEctoShield) protoEctoShield.addEventListener('change', updateProtocolsFromDom);
 
   // Quick Ward Chips
