@@ -20,13 +20,17 @@
   --blue-dim: #1a5fa3;
   --blue-glow: rgba(45, 156, 255, 0.5);
 
-  /* Accent & Text */
+  /* Hack-O-Lantern & Accent Tokens */
+  --glow-orange: #ff6b00;
+  --orange-dim: #cc5500;
+  --orange-glow: rgba(255, 107, 0, 0.45);
   --amber: #f0b429;
   --text: #e6edf3;
   --text-dim: #8b949e;
   --text-faint: #484f58;
 
   /* Typography */
+  --font-serif: 'Cinzel', serif;
   --font-display: 'Rajdhani', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --font-body: 'Inter', sans-serif;
@@ -42,6 +46,27 @@
   --r-md: 12px;
   --r-lg: 18px;
   --r-full: 999px;
+}
+
+/* 2. RESET & BASE */
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #090c10;
+}
+::-webkit-scrollbar-thumb {
+  background: #21262d;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 107, 0, 0.2);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--glow-orange);
 }
 
 /* 2. RESET */
@@ -1714,4 +1739,392 @@ input:focus-visible {
   font-size: 0.72rem;
   color: var(--text-dim);
   margin-bottom: 0.5rem;
+}
+
+/* ==========================================================================
+   HACK-O-LANTERN THEME EXTENSION:
+   Spider Webs, Floating Embers, Moon Halo, Quests, Milestones & Smooth Navigation
+   ========================================================================== */
+
+/* 1. Atmospheric Canvas & Moon Halo */
+.ember-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.moon-halo {
+  position: fixed;
+  top: -160px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 720px;
+  height: 720px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(230, 237, 243, 0.08) 0%, rgba(255, 107, 0, 0.04) 45%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(24px);
+}
+
+/* 2. Corner Spider Webs & Dangling Spider */
+.corner-web {
+  position: fixed;
+  pointer-events: none;
+  z-index: 900;
+  transition: opacity var(--dur-med) ease;
+}
+
+.corner-web--tr {
+  top: 0;
+  right: 0;
+  width: 280px;
+  height: 280px;
+}
+
+.corner-web--tr svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7));
+}
+
+.corner-web--tl {
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 200px;
+  opacity: 0.65;
+}
+
+.corner-web--tl svg {
+  width: 100%;
+  height: 100%;
+}
+
+.spider-suspension {
+  transform-origin: 175px 130px;
+  animation: spider-sway 4.5s ease-in-out infinite alternate;
+}
+
+@keyframes spider-sway {
+  0% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+  100% {
+    transform: rotate(-3deg);
+  }
+}
+
+.spider-body {
+  filter: drop-shadow(0 0 6px rgba(255, 107, 0, 0.85));
+}
+
+/* 3. Curse Directives & Milestones Section */
+.milestones-section {
+  max-width: 1360px;
+  margin: 1.5rem auto 2.5rem;
+  padding: 2.25rem 2rem;
+  background: linear-gradient(180deg, rgba(22, 27, 34, 0.65) 0%, rgba(13, 17, 23, 0.88) 100%);
+  border: 1px solid rgba(255, 107, 0, 0.22);
+  border-radius: var(--r-lg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.milestones-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--glow-orange), transparent);
+}
+
+.milestones-header {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 2rem;
+}
+
+.milestones-eyebrow {
+  color: var(--glow-orange);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.milestones-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.75rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 107, 0, 0.25);
+}
+
+.milestones-desc {
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* Quests Grid */
+.quests-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.quest-card {
+  background: rgba(13, 17, 23, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--r-md);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  position: relative;
+  transition: all var(--dur-med) var(--ease-out);
+  backdrop-filter: blur(8px);
+}
+
+.quest-card:hover {
+  border-color: rgba(255, 107, 0, 0.45);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(255, 107, 0, 0.18);
+}
+
+.quest-card.is-unlocked {
+  border-color: var(--glow-orange);
+  background: linear-gradient(145deg, rgba(255, 107, 0, 0.12) 0%, rgba(13, 17, 23, 0.92) 100%);
+  box-shadow: 0 0 24px rgba(255, 107, 0, 0.28);
+}
+
+.quest-card.is-unlocked .quest-status-icon {
+  color: var(--glow-orange);
+  text-shadow: 0 0 10px var(--glow-orange);
+}
+
+.quest-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.quest-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--glow-orange);
+  letter-spacing: 0.1em;
+  background: rgba(255, 107, 0, 0.12);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--r-sm);
+}
+
+.quest-status-icon {
+  font-size: 1.05rem;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
+}
+
+.quest-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+
+.quest-rule {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+  flex-grow: 1;
+}
+
+.quest-reward {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--amber);
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  padding-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Chronology & Timeline Rail */
+.chronology-wrapper {
+  background: rgba(9, 12, 16, 0.72);
+  border-radius: var(--r-md);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 1.75rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.chronology-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.rail-step {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--r-sm);
+  transition: all var(--dur-med) ease;
+}
+
+.rail-step.is-active {
+  background: rgba(255, 107, 0, 0.08);
+  border-left: 3px solid var(--glow-orange);
+}
+
+.rail-node {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.diamond-marker {
+  color: #555;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: all var(--dur-med) ease;
+}
+
+.rail-step.is-active .diamond-marker {
+  color: var(--glow-orange);
+  text-shadow: 0 0 14px var(--glow-orange);
+  transform: scale(1.25);
+}
+
+.rail-step.is-completed .diamond-marker {
+  color: var(--amber);
+  text-shadow: 0 0 8px var(--amber);
+}
+
+.rail-time {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+}
+
+.rail-step.is-active .rail-time {
+  color: var(--glow-orange);
+}
+
+.rail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.rail-heading {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.03em;
+}
+
+.rail-step.is-active .rail-heading {
+  color: #fff;
+}
+
+.rail-detail {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.rail-connector {
+  width: 2px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  margin-left: 20px;
+}
+
+/* Slide Down Cue */
+.slide-cue-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.slide-down-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.75rem;
+  background: linear-gradient(135deg, rgba(255, 107, 0, 0.15) 0%, rgba(22, 27, 34, 0.9) 100%);
+  border: 1px solid var(--glow-orange);
+  border-radius: var(--r-full);
+  color: #fff;
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  box-shadow: 0 0 20px rgba(255, 107, 0, 0.25);
+  transition: all var(--dur-med) var(--ease-out);
+  cursor: pointer;
+}
+
+.slide-down-cue:hover {
+  background: var(--glow-orange);
+  color: #000;
+  box-shadow: 0 0 32px rgba(255, 107, 0, 0.65);
+  transform: translateY(2px);
+}
+
+.slide-down-icon {
+  display: inline-block;
+  font-size: 1.1rem;
+  animation: cue-bounce 1.5s ease-in-out infinite;
+}
+
+@keyframes cue-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+@media (max-width: 768px) {
+  .corner-web--tr {
+    width: 170px;
+    height: 170px;
+  }
+  .corner-web--tl {
+    width: 120px;
+    height: 120px;
+  }
+  .rail-step {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  .rail-connector {
+    display: none;
+  }
 }
