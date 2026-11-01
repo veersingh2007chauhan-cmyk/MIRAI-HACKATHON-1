@@ -20,8 +20,8 @@
   <!-- Atmospheric Moon Halo Backdrop -->
   <div class="moon-halo" aria-hidden="true"></div>
 
-  <!-- Top-Right Corner Spider Web with Hanging Spider (From User Request Image) -->
-  <div class="corner-web corner-web--tr" aria-hidden="true">
+  <!-- Top-Right Hanging Spider (Silk Thread & Suspended Cyber-Spider - No Web Lines) -->
+  <div class="corner-spider-hang" aria-hidden="true">
     <svg viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <radialGradient id="spiderGrad" cx="50%" cy="40%" r="50%">
@@ -31,29 +31,9 @@
         </radialGradient>
       </defs>
 
-      <!-- Radiating spokes from top-right corner (280, 0) -->
-      <line x1="280" y1="0" x2="0" y2="135" stroke="rgba(255,255,255,0.22)" stroke-width="1.2"/>
-      <line x1="280" y1="0" x2="35" y2="210" stroke="rgba(255,255,255,0.28)" stroke-width="1.2"/>
-      <line x1="280" y1="0" x2="110" y2="280" stroke="rgba(255,255,255,0.28)" stroke-width="1.2"/>
-      <line x1="280" y1="0" x2="195" y2="280" stroke="rgba(255,255,255,0.22)" stroke-width="1.2"/>
-      <line x1="280" y1="0" x2="250" y2="280" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
-      <line x1="280" y1="0" x2="0" y2="65" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
-
-      <!-- Concentric silk curves spanning outward -->
-      <path d="M 280,35 Q 245,42 225,75 Q 205,110 215,145 Q 235,175 255,185" stroke="rgba(255,255,255,0.25)" stroke-width="0.9" fill="none"/>
-      <path d="M 280,75 Q 220,88 185,130 Q 155,180 170,230 Q 200,260 230,270" stroke="rgba(255,255,255,0.28)" stroke-width="1" fill="none"/>
-      <path d="M 280,120 Q 195,135 145,190 Q 105,250 140,280" stroke="rgba(255,255,255,0.3)" stroke-width="1.1" fill="none"/>
-      <path d="M 280,170 Q 165,190 95,255 Q 50,280 80,280" stroke="rgba(255,255,255,0.32)" stroke-width="1.1" fill="none"/>
-      <path d="M 280,225 Q 130,250 40,280" stroke="rgba(255,255,255,0.28)" stroke-width="1" fill="none"/>
-
-      <!-- Subtle amber web filaments -->
-      <path d="M 280,18 Q 260,22 250,42 Q 240,62 245,82" stroke="rgba(255,110,0,0.38)" stroke-width="0.8" fill="none"/>
-      <path d="M 280,55 Q 235,65 208,100 Q 185,140 195,180" stroke="rgba(255,110,0,0.38)" stroke-width="0.8" fill="none"/>
-      <path d="M 280,95 Q 208,110 165,160 Q 130,215 150,255" stroke="rgba(255,110,0,0.38)" stroke-width="0.8" fill="none"/>
-
-      <!-- Dangling silk thread with suspended glowing spider (Tucked safely in top corner margin) -->
+      <!-- Dangling silk thread hanging down from top edge to the spider -->
       <g class="spider-suspension">
-        <line x1="225" y1="30" x2="225" y2="82" stroke="rgba(255,255,255,0.55)" stroke-width="1.2" stroke-dasharray="3 2"/>
+        <line x1="225" y1="0" x2="225" y2="82" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-dasharray="3 2"/>
         <g class="spider-body">
           <!-- Spider Abdomen -->
           <ellipse cx="225" cy="94" rx="8" ry="11" fill="url(#spiderGrad)"/>
@@ -75,20 +55,6 @@
           <path d="M 221 110 Q 209 124 213 135 M 229 110 Q 241 124 237 135" stroke="#ff6b00" stroke-width="1.6" stroke-linecap="round" fill="none"/>
         </g>
       </g>
-    </svg>
-  </div>
-
-  <!-- Top-Left Corner Spider Web (Framing Web) -->
-  <div class="corner-web corner-web--tl" aria-hidden="true">
-    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <line x1="0" y1="0" x2="200" y2="100" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
-      <line x1="0" y1="0" x2="160" y2="180" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>
-      <line x1="0" y1="0" x2="90" y2="200" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>
-      <line x1="0" y1="0" x2="30" y2="200" stroke="rgba(255,255,255,0.16)" stroke-width="1"/>
-      <path d="M 0,30 Q 30,35 45,60 Q 60,85 55,115" stroke="rgba(255,255,255,0.2)" stroke-width="0.8" fill="none"/>
-      <path d="M 0,65 Q 55,75 85,110 Q 110,150 95,190" stroke="rgba(255,255,255,0.22)" stroke-width="0.9" fill="none"/>
-      <path d="M 0,110 Q 80,125 125,170 Q 145,195 155,200" stroke="rgba(255,255,255,0.25)" stroke-width="1" fill="none"/>
-      <path d="M 0,160 Q 110,180 180,200" stroke="rgba(255,255,255,0.2)" stroke-width="0.8" fill="none"/>
     </svg>
   </div>
 
