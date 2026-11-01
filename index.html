@@ -33,6 +33,7 @@
     </div>
 
     <div class="header-actions">
+      <button id="soundToggleBtn" class="btn btn--ghost" type="button" aria-label="Toggle Sound Effects">🔊 SFX ON</button>
       <button id="resetBtn" class="btn btn--ghost" type="button" aria-label="Reset Round">RESET ROUND</button>
       <button id="endBtn" class="btn btn--attack" type="button" aria-label="End Round">END ROUND</button>
     </div>
@@ -121,17 +122,40 @@
           <h2 class="console-title">CURSE INJECTION</h2>
         </div>
 
-        <div class="curse-palette" role="group" aria-label="Preset Curse Payloads">
-          <button class="curse-chip" data-curse="override" type="button">Prompt Override</button>
-          <button class="curse-chip" data-curse="hijack" type="button">Role Hijack</button>
-          <button class="curse-chip" data-curse="poison" type="button">Data Poison</button>
-          <button class="curse-chip" data-curse="canary" type="button">Canary Leak</button>
-          <button class="curse-chip" data-curse="nested" type="button">Nested Curse</button>
+        <!-- Attack Vector Tabs -->
+        <div class="vector-tabs" role="tablist" aria-label="Curse Categories">
+          <button class="vector-tab is-active" data-cat="injections" type="button" role="tab" aria-selected="true">INJECTIONS</button>
+          <button class="vector-tab" data-cat="evasion" type="button" role="tab" aria-selected="false">STEALTH &amp; EVASION</button>
+          <button class="vector-tab" data-cat="social" type="button" role="tab" aria-selected="false">SOCIAL ENG</button>
+          <button class="vector-tab" data-cat="denial" type="button" role="tab" aria-selected="false">DENIAL &amp; GLITCH</button>
+        </div>
+
+        <!-- Dynamic Curse Palette -->
+        <div class="curse-palette" id="cursePalette" role="group" aria-label="Preset Curse Payloads">
+          <!-- Populated by JS based on active tab -->
+        </div>
+
+        <!-- Attack Mutators Toolbar -->
+        <div class="mutators-toolbar" role="toolbar" aria-label="Attack Payload Mutators">
+          <span class="toolbar-label">MUTATORS:</span>
+          <button id="mutatorBase64" class="btn-mutator" type="button" title="Encode entire payload into Base64 format">[⚡ BASE64]</button>
+          <button id="mutatorLeet" class="btn-mutator" type="button" title="Convert keywords into Leetspeak to evade string filters">[🔤 LEET-EVADE]</button>
+          <button id="mutatorSuffix" class="btn-mutator" type="button" title="Append adversarial jailbreak suffix">[🔮 ADVERSARIAL SUFFIX]</button>
+          <button id="mutatorCaps" class="btn-mutator" type="button" title="Uppercase scream payload to stress boundary filters">[🔠 SCREAM]</button>
         </div>
 
         <div class="form-group">
           <label for="payloadInput" class="form-label">Or write a custom curse:</label>
-          <textarea id="payloadInput" class="payload-input" placeholder="Type your curse payload..." aria-label="Custom curse payload input"></textarea>
+          <textarea id="payloadInput" class="payload-input" placeholder="Type or mutate your curse payload..." aria-label="Custom curse payload input"></textarea>
+        </div>
+
+        <!-- Attack Powerup Toggle -->
+        <div class="powerup-row">
+          <label class="power-toggle" for="ectoSurgeToggle">
+            <input type="checkbox" id="ectoSurgeToggle">
+            <span class="toggle-slider"></span>
+            <span class="toggle-text">⚡ ECTO-SURGE (+15 DMG, 35 TOTAL CRITICAL)</span>
+          </label>
         </div>
 
         <div class="button-row">
@@ -147,14 +171,62 @@
           <h2 class="console-title">WARD ENGINE</h2>
         </div>
 
+        <!-- Active Security Protocols (Firewalls) -->
+        <div class="protocols-panel" aria-label="Defensive Security Protocols">
+          <div class="protocols-title">
+            <span>DEFENSIVE PROTOCOLS</span>
+            <span class="protocols-badge" id="protocolStatusBadge">2/3 ONLINE</span>
+          </div>
+          <div class="protocols-grid">
+            <label class="protocol-card is-active" for="protoSanitizer">
+              <input type="checkbox" id="protoSanitizer" checked>
+              <div class="protocol-info">
+                <span class="protocol-name">Sanitizer Firewall</span>
+                <span class="protocol-desc">Normalizes leetspeak &amp; symbols before ward scan</span>
+              </div>
+              <span class="protocol-status">ACTIVE</span>
+            </label>
+
+            <label class="protocol-card is-active" for="protoBase64">
+              <input type="checkbox" id="protoBase64" checked>
+              <div class="protocol-info">
+                <span class="protocol-name">Base64 Inspector</span>
+                <span class="protocol-desc">Decodes and scans obscured base64 injections</span>
+              </div>
+              <span class="protocol-status">ACTIVE</span>
+            </label>
+
+            <label class="protocol-card" for="protoEctoShield">
+              <input type="checkbox" id="protoEctoShield">
+              <div class="protocol-info">
+                <span class="protocol-name">Ecto-Shield</span>
+                <span class="protocol-desc">Absorbs 50% breach damage (takes 10 HP instead of 20)</span>
+              </div>
+              <span class="protocol-status">STANDBY</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Quick Ward Presets -->
+        <div class="quick-wards" role="group" aria-label="Quick Ward Presets">
+          <span class="quick-wards-label">QUICK WARDS:</span>
+          <button class="quick-ward-chip" data-ward="block:ignore" type="button">+ ignore</button>
+          <button class="quick-ward-chip" data-ward="block:system prompt" type="button">+ system prompt</button>
+          <button class="quick-ward-chip" data-ward="block:secret" type="button">+ secret</button>
+          <button class="quick-ward-chip" data-ward="block:override" type="button">+ override</button>
+          <button class="quick-ward-chip" data-ward="block:maintenance" type="button">+ maintenance</button>
+          <button class="quick-ward-chip" data-ward="limit:90" type="button">+ limit:90</button>
+          <button class="quick-ward-chip" data-ward="regex:[0-9a-f]{8,}" type="button">+ regex:hex-token</button>
+        </div>
+
         <!-- Wards list will be populated dynamically by JS with starter wards -->
         <div class="ward-list" id="wardList" role="region" aria-label="Active Defense Wards">
           <!-- Populated by JS -->
         </div>
 
         <div class="form-group">
-          <label for="wardInput" class="form-label">Add a ward rule:</label>
-          <input id="wardInput" class="ward-input" placeholder="e.g. block:ignore previous" aria-label="New ward rule definition" />
+          <label for="wardInput" class="form-label">Add a ward rule (block:..., limit:..., regex:...):</label>
+          <input id="wardInput" class="ward-input" placeholder="e.g. block:ignore, limit:90, regex:admin|root" aria-label="New ward rule definition" />
         </div>
 
         <div class="button-row">
@@ -166,9 +238,20 @@
 
     <!-- 4. LIVE FEED -->
     <section class="live-feed" aria-label="Live Battle Feed">
-      <div class="live-feed__title">
-        <span class="feed-pulse" aria-hidden="true"></span>
-        <h2>LIVE BATTLE FEED</h2>
+      <div class="live-feed__header">
+        <div class="live-feed__title">
+          <span class="feed-pulse" aria-hidden="true"></span>
+          <h2>LIVE BATTLE FEED</h2>
+        </div>
+
+        <!-- Feed Filter Toolbar -->
+        <div class="feed-filters" role="toolbar" aria-label="Battle Feed Filters">
+          <button class="feed-filter is-active" data-filter="all" type="button">ALL</button>
+          <button class="feed-filter" data-filter="attack" type="button">ATTACKS</button>
+          <button class="feed-filter" data-filter="defense" type="button">DEFENSE</button>
+          <button class="feed-filter" data-filter="system" type="button">SYSTEM</button>
+          <button id="clearFeedBtn" class="feed-clear-btn" type="button" title="Clear Feed">CLEAR</button>
+        </div>
       </div>
 
       <div class="feed-log" id="feedLog" role="log" aria-live="polite" aria-atomic="false">
