@@ -177,21 +177,13 @@
       <section class="view-panel is-active" id="viewLive" aria-label="Live Battle Arena">
         <!-- ARENA HEADER -->
         <header class="arena-header">
-    <div class="header-brand">
-      <span class="sigil-dot" aria-hidden="true"></span>
-      <div class="brand-text">
-        <h1 class="brand-title">CURSE 03</h1>
-        <span class="brand-subtitle">Possessed Butler</span>
-      </div>
-    </div>
+          <div class="round-banner" id="roundBanner">
+            <span class="pulse-pill is-standby" id="battleStatusPill" aria-label="Round Status">STANDBY • READY</span>
+            <button id="startBattleBtn" class="btn-start-battle" type="button" aria-label="Engage Battle">▶ ENGAGE BATTLE</button>
+            <div class="round-timer is-paused" id="roundTimer" aria-label="Round Timer">02:00</div>
+          </div>
 
-    <div class="round-banner" id="roundBanner">
-      <span class="pulse-pill is-standby" id="battleStatusPill" aria-label="Round Status">STANDBY • READY</span>
-      <button id="startBattleBtn" class="btn-start-battle" type="button" aria-label="Engage Battle">▶ ENGAGE BATTLE</button>
-      <div class="round-timer is-paused" id="roundTimer" aria-label="Round Timer">02:00</div>
-    </div>
-
-    <div class="header-actions">
+          <div class="header-actions">
       <select id="difficultySelect" class="difficulty-select" aria-label="Game Difficulty">
         <option value="easy">EASY (180s)</option>
         <option value="medium" selected>MEDIUM (120s)</option>
