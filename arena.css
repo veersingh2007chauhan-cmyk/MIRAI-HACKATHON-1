@@ -1834,19 +1834,19 @@ input:focus-visible {
   filter: blur(24px);
 }
 
-/* 2. Corner Spider Webs & Dangling Spider */
+/* 2. Corner Spider Webs & Dangling Spider (Background Layer) */
 .corner-web {
   position: fixed;
   pointer-events: none;
-  z-index: 900;
+  z-index: 1; /* Shifted to true background below all content panels */
   transition: opacity var(--dur-med) ease;
 }
 
 .corner-web--tr {
   top: 0;
   right: 0;
-  width: 360px;
-  height: 360px;
+  width: 320px;
+  height: 320px;
 }
 
 .corner-web--tr svg {
@@ -1858,9 +1858,9 @@ input:focus-visible {
 .corner-web--tl {
   top: 0;
   left: 0;
-  width: 200px;
-  height: 200px;
-  opacity: 0.65;
+  width: 180px;
+  height: 180px;
+  opacity: 0.4;
 }
 
 .corner-web--tl svg {
@@ -1869,16 +1869,16 @@ input:focus-visible {
 }
 
 .spider-suspension {
-  transform-origin: 175px 130px;
+  transform-origin: 225px 45px;
   animation: spider-sway 4.5s ease-in-out infinite alternate;
 }
 
 @keyframes spider-sway {
   0% {
-    transform: rotate(-5deg);
+    transform: rotate(-4deg);
   }
   50% {
-    transform: rotate(3deg);
+    transform: rotate(2deg);
   }
   100% {
     transform: rotate(-3deg);
@@ -2245,7 +2245,7 @@ input:focus-visible {
 .app-sidebar {
   width: 175px;
   min-width: 175px;
-  background: rgba(9, 7, 16, 0.95);
+  background: #08060d; /* Solid opaque obsidian - zero bleed-through */
   border-right: 1px solid rgba(255, 42, 42, 0.22);
   display: flex;
   flex-direction: column;
@@ -2254,10 +2254,8 @@ input:focus-visible {
   position: sticky;
   top: 0;
   height: 100vh;
-  z-index: 500;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.65);
+  z-index: 200;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.75);
   user-select: none;
 }
 
@@ -2266,7 +2264,7 @@ input:focus-visible {
   flex-direction: column;
 }
 
-/* Sidebar Brand with Pink Ghost Icon (Image 2) */
+/* Sidebar Brand with Pink Ghost Icon (Image 2 & 5) */
 .sidebar-brand {
   display: flex;
   align-items: center;
@@ -2277,28 +2275,39 @@ input:focus-visible {
 }
 
 .pink-ghost-badge {
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 112, 166, 0.22) 0%, rgba(255, 112, 166, 0.05) 75%);
-  border: 1.5px solid rgba(255, 112, 166, 0.45);
+  background: radial-gradient(circle, rgba(255, 112, 166, 0.28) 0%, rgba(255, 112, 166, 0.06) 75%);
+  border: 2px solid rgba(255, 112, 166, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 16px rgba(255, 112, 166, 0.35);
-  transition: transform var(--dur-fast) ease;
+  box-shadow: 0 0 18px rgba(255, 112, 166, 0.45), inset 0 0 8px rgba(255, 112, 166, 0.2);
+  transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
   cursor: pointer;
 }
 
 .pink-ghost-badge:hover {
-  transform: scale(1.08) rotate(-4deg);
+  transform: scale(1.08);
+  box-shadow: 0 0 24px rgba(255, 112, 166, 0.7), inset 0 0 12px rgba(255, 112, 166, 0.35);
 }
 
 .pink-ghost-svg {
-  width: 25px;
-  height: 25px;
-  filter: drop-shadow(0 0 5px rgba(255, 112, 166, 0.75));
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 0 6px rgba(255, 112, 166, 0.8));
+  animation: ghost-bob 3s ease-in-out infinite alternate;
+}
+
+@keyframes ghost-bob {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-2px);
+  }
 }
 
 .sidebar-brand-text {
@@ -2496,7 +2505,7 @@ input:focus-visible {
 .subview-container {
   max-width: 1360px;
   margin: 0 auto;
-  padding: 2.5rem 2rem 5rem;
+  padding: 2.5rem 2rem 8.5rem;
   position: relative;
   min-height: 85vh;
 }
@@ -2528,26 +2537,31 @@ input:focus-visible {
   grid-template-columns: 1fr 200px 1fr;
   gap: 1.5rem;
   margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 5;
 }
 
 .lead-card {
-  background: var(--surface);
+  background: rgba(18, 22, 30, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   padding: 1.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   position: relative;
+  z-index: 5;
   overflow: hidden;
 }
 
 .lead-card--red {
   border-top: 3px solid var(--red);
-  background: linear-gradient(180deg, rgba(255, 56, 96, 0.08) 0%, var(--surface) 40%);
+  background: linear-gradient(180deg, rgba(255, 56, 96, 0.12) 0%, rgba(18, 22, 30, 0.96) 40%);
 }
 
 .lead-card--blue {
   border-top: 3px solid var(--blue);
-  background: linear-gradient(180deg, rgba(45, 156, 255, 0.08) 0%, var(--surface) 40%);
+  background: linear-gradient(180deg, rgba(45, 156, 255, 0.12) 0%, rgba(18, 22, 30, 0.96) 40%);
 }
 
 .lead-card--vs {
@@ -2557,8 +2571,8 @@ input:focus-visible {
   justify-content: center;
   text-align: center;
   gap: 0.75rem;
-  background: rgba(14, 11, 24, 0.8);
-  border: 1px solid rgba(255, 107, 0, 0.3);
+  background: rgba(14, 11, 24, 0.92);
+  border: 1px solid rgba(255, 107, 0, 0.35);
 }
 
 .lead-card__badge {
@@ -2631,11 +2645,15 @@ input:focus-visible {
 
 /* Telemetry Stream Table */
 .telemetry-table-wrapper {
-  background: rgba(14, 10, 24, 0.85);
+  background: rgba(14, 10, 24, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(165, 80, 255, 0.22);
   border-radius: var(--r-md);
   padding: 1.5rem;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 5;
 }
 
 .telemetry-heading {
@@ -2681,16 +2699,21 @@ input:focus-visible {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
-  margin-bottom: 3rem;
+  margin-bottom: 3.5rem;
+  position: relative;
+  z-index: 5;
 }
 
 .rule-card {
-  background: var(--surface);
+  background: rgba(18, 22, 30, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   padding: 1.75rem;
   position: relative;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   transition: all var(--dur-med) ease;
 }
 
@@ -2737,14 +2760,20 @@ input:focus-visible {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
+  position: relative;
+  z-index: 5;
 }
 
 .setting-card {
-  background: var(--surface);
+  background: rgba(18, 22, 30, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   padding: 1.75rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
 }
 
 .setting-title {
@@ -2760,40 +2789,43 @@ input:focus-visible {
   color: var(--text-dim);
 }
 
-/* 8. Haunted Manor Corner Scene (Image 1) */
+/* 8. Haunted Manor Corner Scene (Reference Image) */
 .haunted-corner-scene {
   position: absolute;
-  right: 1.5rem;
-  bottom: 1.5rem;
-  width: 320px;
-  height: 220px;
+  right: 0;
+  bottom: 0;
+  width: 390px;
+  height: 250px;
   pointer-events: none;
-  z-index: 5;
+  z-index: 1; /* True background layer behind all content cards */
+  opacity: 0.85;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   justify-content: flex-end;
+  overflow: hidden;
 }
 
 .manor-svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.7));
+  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.8));
 }
 
 .haunted-corner-text {
   position: absolute;
-  bottom: 0.5rem;
-  right: 1rem;
+  bottom: 0.75rem;
+  right: 1.25rem;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   text-align: right;
   font-family: var(--font-serif);
   font-style: italic;
-  color: #e59090;
-  text-shadow: 0 0 10px rgba(229, 144, 144, 0.6), 0 2px 4px #000;
-  pointer-events: auto;
+  color: #ff9e9e;
+  text-shadow: 0 0 10px rgba(255, 120, 120, 0.5), 0 2px 4px #000;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .corner-whisper-1 {
@@ -2803,7 +2835,11 @@ input:focus-visible {
 
 .corner-whisper-2 {
   font-size: 0.88rem;
-  color: #ff9999;
+  color: #ffaaaa;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
   display: flex;
   align-items: center;
   gap: 0.35rem;
