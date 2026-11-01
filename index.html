@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CURSE 03 — Possessed Butler: Adversarial Attack &amp; Defense Arena. Red Team prompt injection vs Blue Team defensive wards.">
+  <title>CURSE 03 — Possessed Butler</title>
+  
+  <!-- Google Fonts: Cinzel (Gothic Editorial Serif), Rajdhani (500,700), JetBrains Mono (400,600), Inter (400,500,600) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="arena.css">
+</head>
+<body>
+  <!-- Ember Particles Canvas (Atmospheric Floating Sparks) -->
+  <canvas id="emberCanvas" class="ember-canvas" aria-hidden="true"></canvas>
+
+  <!-- Atmospheric Moon Halo Backdrop -->
+  <div class="moon-halo" aria-hidden="true"></div>
+
+  <!-- Top-Right Hanging Spider (Silk Thread & Suspended Cyber-Spider - No Web Lines) -->
+  <div class="corner-spider-hang" aria-hidden="true">
+    <svg viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="spiderGrad" cx="50%" cy="40%" r="50%">
+          <stop offset="0%" stop-color="#ff9d1a"/>
+          <stop offset="60%" stop-color="#ff6b00"/>
+          <stop offset="100%" stop-color="#cc3b00"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Dangling silk thread hanging down from top edge to the spider -->
+      <g class="spider-suspension">
+        <line x1="225" y1="0" x2="225" y2="82" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-dasharray="3 2"/>
+        <g class="spider-body">
+          <!-- Spider Abdomen -->
+          <ellipse cx="225" cy="94" rx="8" ry="11" fill="url(#spiderGrad)"/>
+          <!-- Spider Glow Marking -->
+          <path d="M 225 86 L 225 100 M 220 93 L 230 93" stroke="#ffe082" stroke-width="1.3" stroke-linecap="round"/>
+          <!-- Spider Cephalothorax -->
+          <circle cx="225" cy="107" r="6" fill="#e65100"/>
+          <!-- Chelicerae / Fangs -->
+          <path d="M 222 112 L 221 116 M 228 112 L 229 116" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round"/>
+          <!-- Optical Sensor Eyes -->
+          <circle cx="222.5" cy="106" r="1.3" fill="#ff2a2a"/>
+          <circle cx="227.5" cy="106" r="1.3" fill="#ff2a2a"/>
+          <circle cx="221.7" cy="108" r="0.8" fill="#fff"/>
+          <circle cx="228.3" cy="108" r="0.8" fill="#fff"/>
+          <!-- Articulated Spider Legs -->
+          <path d="M 220 103 Q 204 95 195 106 M 230 103 Q 246 95 255 106" stroke="#ff6b00" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          <path d="M 219 106 Q 200 107 193 118 M 231 106 Q 250 107 257 118" stroke="#ff6b00" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          <path d="M 220 108 Q 202 118 200 128 M 230 108 Q 248 118 250 128" stroke="#ff6b00" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          <path d="M 221 110 Q 209 124 213 135 M 229 110 Q 241 124 237 135" stroke="#ff6b00" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Vignette overlay for hit and alert events -->
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- APPLICATION SHELL LAYOUT -->
+  <div class="app-layout">
+    <!-- LEFT SIDEBAR NAVIGATION (IMAGE 2) -->
+    <aside class="app-sidebar" id="appSidebar" aria-label="Main Navigation">
+      <div class="sidebar-top">
+        <!-- Pink Ghost Icon & Branding (Image 2) -->
+        <div class="sidebar-brand">
+          <div class="pink-ghost-badge" title="Possessed Butler Sigil">
+            <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="pink-ghost-svg" aria-hidden="true">
+              <!-- Outer Soft Ghost Body -->
+              <path d="M18 4C10.8 4 5.5 9.6 5.5 16.5V28.5C5.5 29.4 6.2 30 7 29.7L9.8 28.5L12.6 30.2C13.3 30.6 14.1 30.4 14.6 29.8L16.2 27.8L17.8 29.8C18.3 30.4 19.1 30.6 19.8 30.2L22.6 28.5L25.4 29.7C26.2 30 26.9 29.4 26.9 28.5V16.5C26.9 9.6 21.6 4 18 4Z" fill="#ff70a6"/>
+              <!-- Soft Inner Highlight Layer -->
+              <path d="M18 6.5C12.2 6.5 7.8 10.8 7.8 16.5V26.8L10 25.8L12.8 27.5L15.3 24.3L17.9 27.5L20.6 25.8L23.2 26.8V16.5C23.2 10.8 19.8 6.5 18 6.5Z" fill="#ffa2c2" opacity="0.45"/>
+              <!-- Ghost Eyes -->
+              <ellipse cx="12.5" cy="15.2" rx="2.2" ry="2.7" fill="#1b1220"/>
+              <ellipse cx="19.5" cy="15.2" rx="2.2" ry="2.7" fill="#1b1220"/>
+              <!-- Eye Specular Highlights -->
+              <circle cx="11.8" cy="14.3" r="0.9" fill="#ffffff"/>
+              <circle cx="18.8" cy="14.3" r="0.9" fill="#ffffff"/>
+              <!-- Soft Pink Cheeks -->
+              <circle cx="9.8" cy="18.2" r="1.4" fill="#ff3377" opacity="0.6"/>
+              <circle cx="22.2" cy="18.2" r="1.4" fill="#ff3377" opacity="0.6"/>
+              <!-- Cute Smile -->
+              <path d="M14.5 19.2C14.5 20.5 15.6 21.5 17 21.5C18.4 21.5 19.5 20.5 19.5 19.2" stroke="#1b1220" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="sidebar-brand-text">
+            <span class="brand-title-sidebar">CURSE 03</span>
+            <span class="brand-subtitle-sidebar">Possessed Butler</span>
+          </div>
+        </div>
+
+        <!-- Navigation Links (Image 2) -->
+        <nav class="sidebar-nav" aria-label="Sections Navigation">
+          <button class="nav-item is-active" data-view="live" id="navLive" type="button" aria-label="Live Arena">
+            <span class="nav-notch" aria-hidden="true"></span>
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+            </span>
+            <span class="nav-label">Live</span>
+            <span class="nav-badge-dot" aria-hidden="true"></span>
+          </button>
+
+          <button class="nav-item" data-view="leaderboard" id="navLeaderboard" type="button" aria-label="Leaderboard">
+            <span class="nav-notch" aria-hidden="true"></span>
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                <path d="M4 22h16"></path>
+                <path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-2.34"></path>
+                <path d="M18 17v-2.34"></path>
+                <path d="M18 9a6 6 0 0 1-12 0V4h12v5z"></path>
+              </svg>
+            </span>
+            <span class="nav-label">Leaderboard</span>
+            <span class="nav-badge-dot" aria-hidden="true"></span>
+          </button>
+
+          <button class="nav-item" data-view="rules" id="navRules" type="button" aria-label="Rules">
+            <span class="nav-notch" aria-hidden="true"></span>
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                <line x1="9" y1="7" x2="16" y2="7"></line>
+                <line x1="9" y1="11" x2="16" y2="11"></line>
+              </svg>
+            </span>
+            <span class="nav-label">Rules</span>
+            <span class="nav-badge-dot" aria-hidden="true"></span>
+          </button>
+
+          <button class="nav-item" data-view="settings" id="navSettings" type="button" aria-label="Settings">
+            <span class="nav-notch" aria-hidden="true"></span>
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </span>
+            <span class="nav-label">Settings</span>
+            <span class="nav-badge-dot" aria-hidden="true"></span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Sidebar Footer (Pumpkin & Note from Image 2) -->
+      <div class="sidebar-footer">
+        <div class="sidebar-pumpkin-wrapper">
+          <svg viewBox="0 0 60 50" fill="none" xmlns="http://www.w3.org/2000/svg" class="sidebar-pumpkin-svg" aria-hidden="true">
+            <path d="M30 12C31 8 34 5 38 4C37 7 35 10 32 12" stroke="#2d7a3e" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <ellipse cx="30" cy="28" rx="22" ry="18" fill="#e65100"/>
+            <ellipse cx="30" cy="28" rx="17" ry="18" fill="#f57c00"/>
+            <ellipse cx="30" cy="28" rx="10" ry="18" fill="#ff9800"/>
+            <polygon points="21,22 25,27 17,27" fill="#ffe082"/>
+            <polygon points="39,22 43,27 35,27" fill="#ffe082"/>
+            <polygon points="30,27 32,31 28,31" fill="#ffe082"/>
+            <path d="M18 36L22 34L26 37L30 34L34 37L38 34L42 36L39 39L35 37L31 40L29 40L25 37L21 39Z" fill="#ffe082"/>
+          </svg>
+        </div>
+        <p class="sidebar-eerie-note">
+          Good luck...<br>
+          <span>Or else... 👻</span>
+        </p>
+      </div>
+    </aside>
+
+    <!-- MAIN VIEWPORT -->
+    <div class="app-viewport" id="appViewport">
+      <!-- VIEW 1: LIVE (IMAGE 3 - UNTOUCHED CONTENT) -->
+      <section class="view-panel is-active" id="viewLive" aria-label="Live Battle Arena">
+        <!-- ARENA HEADER -->
+        <header class="arena-header">
+          <div class="round-banner" id="roundBanner">
+            <span class="pulse-pill is-standby" id="battleStatusPill" aria-label="Round Status">STANDBY • READY</span>
+            <button id="startBattleBtn" class="btn-start-battle" type="button" aria-label="Engage Battle">▶ ENGAGE BATTLE</button>
+            <div class="round-timer is-paused" id="roundTimer" aria-label="Round Timer">02:00</div>
+          </div>
+
+          <div class="header-actions">
+      <select id="difficultySelect" class="difficulty-select" aria-label="Game Difficulty">
+        <option value="easy">EASY (180s)</option>
+        <option value="medium" selected>MEDIUM (120s)</option>
+        <option value="hard">HARD (90s)</option>
+        <option value="nightmare">NIGHTMARE (60s)</option>
+      </select>
+      <button id="teamNameBtn" class="btn btn--ghost" type="button" aria-label="Customize Team Names">👥 TEAMS</button>
+      <button id="soundToggleBtn" class="btn btn--ghost" type="button" aria-label="Toggle Sound Effects">🔊 SFX ON</button>
+      <button id="resetBtn" class="btn btn--ghost" type="button" aria-label="Reset Round">RESET ROUND</button>
+      <button id="endBtn" class="btn btn--attack" type="button" aria-label="End Round">END ROUND</button>
+    </div>
+  </header>
+
+  <!-- ARENA MAIN -->
+  <main class="arena-main">
+    <!-- 1. SCOREBOARD -->
+    <section class="scoreboard" aria-label="Scoreboard">
+      <div class="score-card score-card--red">
+        <span class="team-label" id="redTeamLabel">RED TEAM</span>
+        <span class="score-value" id="redScore">0</span>
+        <span class="score-sublabel">ATTACK POINTS</span>
+      </div>
+
+      <div class="score-center">
+        <div class="round-badge">ROUND 1 / 3</div>
+        <span class="round-caption">FIRST TO 5</span>
+      </div>
+
+      <div class="score-card score-card--blue">
+        <span class="team-label" id="blueTeamLabel">BLUE TEAM</span>
+        <span class="score-value" id="blueScore">0</span>
+        <span class="score-sublabel">DEFENSE POINTS</span>
+      </div>
+    </section>
+
+    <!-- 2. DUEL ARENA -->
+    <section class="duel-arena" aria-label="Duel Arena">
+      <!-- Red Agent (Attacker) -->
+      <article class="agent-card agent-card--red">
+        <div class="agent-avatar-wrap">
+          <img id="redAvatar" src="" alt="The Injector - Red Team Attacker Butler avatar" class="agent-avatar">
+        </div>
+        <h2 class="agent-name">THE INJECTOR <span class="agent-mood" id="redMood" aria-label="Attacker Status">😈</span></h2>
+        <div class="agent-stats">
+          <div class="stat-group">
+            <span class="stat-label">Curses Cast</span>
+            <span class="stat-value" id="redCast">0</span>
+          </div>
+          <div class="stat-group">
+            <span class="stat-label">Success</span>
+            <span class="stat-value" id="redHits">0</span>
+          </div>
+        </div>
+        <div class="agent-health" role="progressbar" aria-label="The Injector Health" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+          <div class="agent-health__fill" id="redHealthFill"></div>
+        </div>
+      </article>
+
+      <!-- Center Divider -->
+      <div class="duel-divider" aria-hidden="true">
+        <span class="vs-text">VS</span>
+        <div class="energy-beam"></div>
+        <span class="duel-status">LIVE ROUND</span>
+      </div>
+
+      <!-- Blue Agent (Defender) -->
+      <article class="agent-card agent-card--blue">
+        <div class="agent-avatar-wrap">
+          <img id="blueAvatar" src="" alt="The Warden - Blue Team Defender Butler avatar" class="agent-avatar">
+        </div>
+        <h2 class="agent-name">THE WARDEN <span class="agent-mood" id="blueMood" aria-label="Defender Status">🛡️</span></h2>
+        <div class="agent-stats">
+          <div class="stat-group">
+            <span class="stat-label">Curses Cast</span>
+            <span class="stat-value" id="blueCast">0</span>
+          </div>
+          <div class="stat-group">
+            <span class="stat-label">Success</span>
+            <span class="stat-value" id="blueHits">0</span>
+          </div>
+        </div>
+        <div class="agent-health" role="progressbar" aria-label="The Warden Health" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+          <div class="agent-health__fill" id="blueHealthFill"></div>
+        </div>
+      </article>
+    </section>
+
+    <!-- HACK-O-LANTERN THEME: CURSE DIRECTIVES & MILESTONES -->
+    <section class="milestones-section" id="milestonesSection" aria-label="Curse Directives and Milestones">
+      <div class="milestones-header">
+        <span class="eyebrow milestones-eyebrow">CURSE DIRECTIVES &amp; MILESTONES —</span>
+        <h2 class="milestones-title">When the clock turns.</h2>
+        <p class="milestones-desc">Complete autonomous midnight quests to gain tactical supremacy. As the clock strikes, directives unlock during live combat.</p>
+      </div>
+
+      <!-- Horizontal Quest Strip -->
+      <div class="quests-strip" role="region" aria-label="Adversarial Quests">
+        <article class="quest-card" id="questCard1" data-quest="first-breach">
+          <div class="quest-card__top">
+            <span class="quest-tag">QUEST 01</span>
+            <span class="quest-status-icon" id="questIcon1" title="Locked">
+              <svg class="quest-lock-svg is-locked" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <rect x="4" y="11" width="16" height="11" rx="2.5" fill="rgba(196, 113, 237, 0.16)" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+                <path d="M12 17.5v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+          <h3 class="quest-name">First Injection</h3>
+          <p class="quest-rule">Breach The Warden's defense with any unblocked curse payload.</p>
+          <div class="quest-reward">+1 Attack Point &amp; Glory</div>
+        </article>
+
+        <article class="quest-card" id="questCard2" data-quest="stealth-cloak">
+          <div class="quest-card__top">
+            <span class="quest-tag">QUEST 02</span>
+            <span class="quest-status-icon" id="questIcon2" title="Locked">
+              <svg class="quest-lock-svg is-locked" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <rect x="4" y="11" width="16" height="11" rx="2.5" fill="rgba(196, 113, 237, 0.16)" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+                <path d="M12 17.5v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+          <h3 class="quest-name">Phantom Cloak</h3>
+          <p class="quest-rule">Mutate a curse payload using Base64 or Leet-Evade encoding.</p>
+          <div class="quest-reward">Filter Bypass Ribbon</div>
+        </article>
+
+        <article class="quest-card" id="questCard3" data-quest="iron-citadel">
+          <div class="quest-card__top">
+            <span class="quest-tag">QUEST 03</span>
+            <span class="quest-status-icon" id="questIcon3" title="Locked">
+              <svg class="quest-lock-svg is-locked" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <rect x="4" y="11" width="16" height="11" rx="2.5" fill="rgba(196, 113, 237, 0.16)" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+                <path d="M12 17.5v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+          <h3 class="quest-name">Iron Citadel</h3>
+          <p class="quest-rule">Successfully block 2 consecutive incoming attack curses with active wards.</p>
+          <div class="quest-reward">Warden Aegis Medal</div>
+        </article>
+
+        <article class="quest-card" id="questCard4" data-quest="midnight-critical">
+          <div class="quest-card__top">
+            <span class="quest-tag">QUEST 04</span>
+            <span class="quest-status-icon" id="questIcon4" title="Locked">
+              <svg class="quest-lock-svg is-locked" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <rect x="4" y="11" width="16" height="11" rx="2.5" fill="rgba(196, 113, 237, 0.16)" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+                <path d="M12 17.5v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+          <h3 class="quest-name">Midnight Critical</h3>
+          <p class="quest-rule">Land a successful breach while Ecto-Surge Overdrive is primed.</p>
+          <div class="quest-reward">Possession Sovereign</div>
+        </article>
+      </div>
+
+      <!-- Chronology & Timeline Rail -->
+      <div class="chronology-wrapper">
+        <div class="chronology-rail" aria-label="Match Chronology">
+          <div class="rail-step is-active" id="railStep1">
+            <div class="rail-node">
+              <span class="diamond-marker">♦</span>
+              <span class="rail-time">ROUND 1</span>
+            </div>
+            <div class="rail-info">
+              <h4 class="rail-heading">Butler Awakening &amp; Baseline Wards</h4>
+              <p class="rail-detail">Optical sensors activate. Red crafts initial injection probes while Blue constructs perimeter substring filters.</p>
+            </div>
+          </div>
+
+          <div class="rail-connector"></div>
+
+          <div class="rail-step" id="railStep2">
+            <div class="rail-node">
+              <span class="diamond-marker">♦</span>
+              <span class="rail-time">ROUND 2</span>
+            </div>
+            <div class="rail-info">
+              <h4 class="rail-heading">Midnight Possession &amp; Evasion Mutators</h4>
+              <p class="rail-detail">Circuits surge with ectoplasm. Attackers deploy homoglyphs and encoders; defenders enable canary tokens.</p>
+            </div>
+          </div>
+
+          <div class="rail-connector"></div>
+
+          <div class="rail-step" id="railStep3">
+            <div class="rail-node">
+              <span class="diamond-marker">♦</span>
+              <span class="rail-time">ROUND 3</span>
+            </div>
+            <div class="rail-info">
+              <h4 class="rail-heading">The Witching Hour • Sudden Death</h4>
+              <p class="rail-detail">Neural integrity degrades. Ecto-Surge overdrive unlocked. First team to reach the score cap claims the manor.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Smooth Slide-Down Anchor Cue -->
+      <div class="slide-cue-container">
+        <a href="#combatPanel" class="slide-down-cue" id="slideDownCue" aria-label="Slide down to live combat panel">
+          <span class="slide-down-text">SLIDE DOWN TO ENGAGE</span>
+          <span class="slide-down-icon" aria-hidden="true">↓</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 3. COMBAT PANEL (SPLIT INPUT) -->
+    <section class="combat-panel" id="combatPanel" aria-label="Combat Controls">
+      <!-- Left: Attack Console -->
+      <div class="attack-console">
+        <div class="console-header">
+          <span class="eyebrow">RED TEAM INPUT</span>
+          <h2 class="console-title">CURSE INJECTION</h2>
+        </div>
+
+        <!-- Dynamic Curse Palette (Clean Primary View) -->
+        <div class="curse-palette" id="cursePalette" role="group" aria-label="Preset Curse Payloads">
+          <!-- Populated by JS based on active tab -->
+        </div>
+
+        <div class="form-group">
+          <label for="payloadInput" class="form-label">Or write a custom curse:</label>
+          <textarea id="payloadInput" class="payload-input" placeholder="Type or mutate your curse payload..." aria-label="Custom curse payload input"></textarea>
+        </div>
+
+        <!-- Collapsible Advanced Arsenal Drawer -->
+        <details class="advanced-drawer" id="attackDrawer">
+          <summary class="drawer-summary">
+            <span>⚙ ADVANCED ARSENAL &amp; MUTATORS</span>
+            <span class="drawer-arrow">▾</span>
+          </summary>
+          <div class="drawer-content">
+            <!-- Attack Vector Tabs -->
+            <div class="vector-tabs" role="tablist" aria-label="Curse Categories">
+              <button class="vector-tab is-active" data-cat="injections" type="button" role="tab" aria-selected="true">INJECTIONS</button>
+              <button class="vector-tab" data-cat="evasion" type="button" role="tab" aria-selected="false">STEALTH &amp; EVASION</button>
+              <button class="vector-tab" data-cat="social" type="button" role="tab" aria-selected="false">SOCIAL ENG</button>
+              <button class="vector-tab" data-cat="denial" type="button" role="tab" aria-selected="false">DENIAL &amp; GLITCH</button>
+            </div>
+
+            <!-- Attack Mutators Toolbar -->
+            <div class="mutators-toolbar" role="toolbar" aria-label="Attack Payload Mutators">
+              <span class="toolbar-label">MUTATORS:</span>
+              <button id="mutatorBase64" class="btn-mutator" type="button" title="Encode entire payload into Base64 format">[⚡ BASE64]</button>
+              <button id="mutatorLeet" class="btn-mutator" type="button" title="Convert keywords into Leetspeak to evade string filters">[🔤 LEET-EVADE]</button>
+              <button id="mutatorSuffix" class="btn-mutator" type="button" title="Append adversarial jailbreak suffix">[🔮 ADVERSARIAL SUFFIX]</button>
+              <button id="mutatorCaps" class="btn-mutator" type="button" title="Uppercase scream payload to stress boundary filters">[🔠 SCREAM]</button>
+            </div>
+
+            <!-- Attack Powerup Toggle -->
+            <div class="powerup-row">
+              <label class="power-toggle" for="ectoSurgeToggle">
+                <input type="checkbox" id="ectoSurgeToggle">
+                <span class="toggle-slider"></span>
+                <span class="toggle-text">⚡ ECTO-SURGE (+15 DMG, 35 TOTAL CRITICAL)</span>
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <div class="button-row">
+          <button id="castBtn" class="btn btn--attack btn--lg" type="button" aria-label="Cast Curse Payload">CAST CURSE</button>
+          <button id="clearBtn" class="btn btn--ghost" type="button" aria-label="Clear payload text">CLEAR</button>
+        </div>
+      </div>
+
+      <!-- Right: Defense Console -->
+      <div class="defense-console">
+        <div class="console-header">
+          <span class="eyebrow">BLUE TEAM INPUT</span>
+          <h2 class="console-title">WARD ENGINE</h2>
+        </div>
+
+        <!-- Wards list (Clean Primary View) -->
+        <div class="ward-list" id="wardList" role="region" aria-label="Active Defense Wards">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="form-group">
+          <label for="wardInput" class="form-label">Add a ward rule (block:..., limit:..., regex:...):</label>
+          <input id="wardInput" class="ward-input" placeholder="e.g. block:ignore, limit:90, regex:admin|root" aria-label="New ward rule definition" />
+        </div>
+
+        <!-- Collapsible Advanced Protocols & Quick Wards Drawer -->
+        <details class="advanced-drawer" id="defenseDrawer">
+          <summary class="drawer-summary">
+            <span>⚙ PROTOCOLS &amp; QUICK WARDS</span>
+            <span class="drawer-arrow">▾</span>
+          </summary>
+          <div class="drawer-content">
+            <!-- Active Security Protocols (Firewalls) -->
+            <div class="protocols-panel" aria-label="Defensive Security Protocols">
+              <div class="protocols-title">
+                <span>DEFENSIVE PROTOCOLS</span>
+                <span class="protocols-badge" id="protocolStatusBadge">3/4 ONLINE</span>
+              </div>
+              <div class="protocols-grid">
+                <label class="protocol-card is-active" for="protoSanitizer">
+                  <input type="checkbox" id="protoSanitizer" checked>
+                  <div class="protocol-info">
+                    <span class="protocol-name">Sanitizer Firewall</span>
+                    <span class="protocol-desc">Normalizes leetspeak &amp; symbols before ward scan</span>
+                  </div>
+                  <span class="protocol-status">ACTIVE</span>
+                </label>
+
+                <label class="protocol-card is-active" for="protoBase64">
+                  <input type="checkbox" id="protoBase64" checked>
+                  <div class="protocol-info">
+                    <span class="protocol-name">Base64 Inspector</span>
+                    <span class="protocol-desc">Decodes and scans obscured base64 injections</span>
+                  </div>
+                  <span class="protocol-status">ACTIVE</span>
+                </label>
+
+                <label class="protocol-card is-active" for="protoHomoglyph">
+                  <input type="checkbox" id="protoHomoglyph" checked>
+                  <div class="protocol-info">
+                    <span class="protocol-name">Homoglyph Normalizer</span>
+                    <span class="protocol-desc">Maps Unicode lookalikes (Ⅰ, А, е, о) to standard ASCII</span>
+                  </div>
+                  <span class="protocol-status">ACTIVE</span>
+                </label>
+
+                <label class="protocol-card" for="protoEctoShield">
+                  <input type="checkbox" id="protoEctoShield">
+                  <div class="protocol-info">
+                    <span class="protocol-name">Ecto-Shield</span>
+                    <span class="protocol-desc">Absorbs 50% breach damage (takes 10 HP instead of 20)</span>
+                  </div>
+                  <span class="protocol-status">STANDBY</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Quick Ward Presets -->
+            <div class="quick-wards" role="group" aria-label="Quick Ward Presets">
+              <span class="quick-wards-label">QUICK WARDS:</span>
+              <button class="quick-ward-chip" data-ward="block:ignore" type="button">+ ignore</button>
+              <button class="quick-ward-chip" data-ward="block:system prompt" type="button">+ system prompt</button>
+              <button class="quick-ward-chip" data-ward="block:secret" type="button">+ secret</button>
+              <button class="quick-ward-chip" data-ward="block:override" type="button">+ override</button>
+              <button class="quick-ward-chip" data-ward="block:maintenance" type="button">+ maintenance</button>
+              <button class="quick-ward-chip" data-ward="strip:base64" type="button">+ strip:base64</button>
+              <button class="quick-ward-chip" data-ward="strip:markdown" type="button">+ strip:markdown</button>
+              <button class="quick-ward-chip" data-ward="canary:BUTLER_KEY" type="button">+ canary:BUTLER_KEY</button>
+              <button class="quick-ward-chip" data-ward="limit:90" type="button">+ limit:90</button>
+              <button class="quick-ward-chip" data-ward="regex:[0-9a-f]{8,}" type="button">+ regex:hex-token</button>
+            </div>
+          </div>
+        </details>
+
+        <div class="button-row">
+          <button id="wardBtn" class="btn btn--defend btn--lg" type="button" aria-label="Engage Ward Rule">ENGAGE WARD</button>
+          <button id="purgeBtn" class="btn btn--ghost" type="button" aria-label="Purge all active wards">PURGE ALL</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. LIVE FEED -->
+    <section class="live-feed" aria-label="Live Battle Feed">
+      <div class="live-feed__header">
+        <div class="live-feed__title">
+          <span class="feed-pulse" aria-hidden="true"></span>
+          <h2>LIVE BATTLE FEED</h2>
+        </div>
+
+        <!-- Feed Filter Toolbar -->
+        <div class="feed-filters" role="toolbar" aria-label="Battle Feed Filters">
+          <button class="feed-filter is-active" data-filter="all" type="button">ALL</button>
+          <button class="feed-filter" data-filter="attack" type="button">ATTACKS</button>
+          <button class="feed-filter" data-filter="defense" type="button">DEFENSE</button>
+          <button class="feed-filter" data-filter="system" type="button">SYSTEM</button>
+          <button id="exportLogBtn" class="feed-filter" type="button" title="Export Battle Log JSON">📥 EXPORT</button>
+          <button id="clearFeedBtn" class="feed-clear-btn" type="button" title="Clear Feed">CLEAR</button>
+        </div>
+      </div>
+
+      <div class="feed-log" id="feedLog" role="log" aria-live="polite" aria-atomic="false">
+        <!-- Log entries populated dynamically -->
+      </div>
+
+      <p class="live-feed__caption">All actions broadcast live to both teams</p>
+    </section>
+  </main>
+      </section>
+
+      <!-- VIEW 2: LEADERBOARD & TELEMETRY -->
+      <section class="view-panel" id="viewLeaderboard" aria-label="Hall of Souls Leaderboard">
+        <div class="subview-container">
+          <header class="subview-header">
+            <span class="eyebrow" style="color: var(--glow-orange);">REAL-TIME MATCH TELEMETRY —</span>
+            <h2 class="subview-title">Hall of Souls: Match Standings</h2>
+            <p class="subview-desc">Live performance metrics, breach frequency rates, and defensive shield standings across active rounds.</p>
+          </header>
+
+          <!-- Leaderboard Summary Cards -->
+          <div class="leaderboard-grid">
+            <div class="lead-card lead-card--red">
+              <div class="lead-card__badge">RED TEAM (INJECTOR)</div>
+              <div class="lead-card__score" id="leadRedScore">0</div>
+              <div class="lead-card__meta">
+                <div class="meta-row"><span>Curses Cast:</span><strong id="leadRedCast">0</strong></div>
+                <div class="meta-row"><span>Successful Breaches:</span><strong id="leadRedHits">0</strong></div>
+                <div class="meta-row"><span>Breach Efficiency:</span><strong id="leadRedAcc">0%</strong></div>
+                <div class="meta-row"><span>Butler Core Integrity:</span><strong id="leadRedHp">100 HP</strong></div>
+              </div>
+            </div>
+
+            <div class="lead-card lead-card--vs">
+              <div class="lead-vs-badge">VS</div>
+              <div class="lead-round-status" id="leadRoundStatus">ROUND 1 IN PROGRESS</div>
+              <div class="lead-timer-readout" id="leadTimerReadout">02:00</div>
+              <button class="btn btn--attack" id="leadJumpCombatBtn" type="button">JUMP TO COMBAT</button>
+            </div>
+
+            <div class="lead-card lead-card--blue">
+              <div class="lead-card__badge">BLUE TEAM (WARDEN)</div>
+              <div class="lead-card__score" id="leadBlueScore">0</div>
+              <div class="lead-card__meta">
+                <div class="meta-row"><span>Wards Engaged:</span><strong id="leadBlueCast">0</strong></div>
+                <div class="meta-row"><span>Intercepted Attacks:</span><strong id="leadBlueHits">0</strong></div>
+                <div class="meta-row"><span>Defense Interception:</span><strong id="leadBlueAcc">0%</strong></div>
+                <div class="meta-row"><span>Butler Core Integrity:</span><strong id="leadBlueHp">100 HP</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Match Log Telemetry Table -->
+          <div class="telemetry-table-wrapper">
+            <h3 class="telemetry-heading">⚡ ADVERSARIAL TELEMETRY STREAM</h3>
+            <div class="telemetry-table" id="leadTelemetryTable">
+              <div class="telemetry-row telemetry-row--header">
+                <span>TIME</span>
+                <span>VECTOR / ACTION</span>
+                <span>PAYLOAD / RULE</span>
+                <span>OUTCOME</span>
+              </div>
+              <div class="telemetry-body" id="leadTelemetryBody">
+                <!-- Dynamically populated from state.feed -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Haunted Manor Corner Illustration (Kept on Leaderboard Page) -->
+          <div class="haunted-corner-scene" aria-hidden="true">
+            <svg viewBox="0 0 420 280" fill="none" xmlns="http://www.w3.org/2000/svg" class="manor-svg" preserveAspectRatio="xRightYBottom meet">
+              <defs>
+                <linearGradient id="hillGrad1_lead" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#19112a"/>
+                  <stop offset="60%" stop-color="#11091d"/>
+                  <stop offset="100%" stop-color="#08040d"/>
+                </linearGradient>
+                <linearGradient id="hillGrad2_lead" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#24173d" stop-opacity="0.6"/>
+                  <stop offset="100%" stop-color="#0c0617" stop-opacity="0.95"/>
+                </linearGradient>
+                <radialGradient id="windowGlow_lead" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#fff1a8"/>
+                  <stop offset="35%" stop-color="#ff9d14"/>
+                  <stop offset="70%" stop-color="#e65100"/>
+                  <stop offset="100%" stop-color="#8a1800"/>
+                </radialGradient>
+              </defs>
+
+              <!-- Distant Hill Crest -->
+              <path d="M0 280 Q 90 220 220 200 Q 320 185 420 180 L 420 280 Z" fill="url(#hillGrad2_lead)"/>
+
+              <!-- Flying Bat Silhouette in Night Sky -->
+              <g class="flying-bat" transform="translate(290, 38)">
+                <path d="M22 14 C18 6, 8 4, 0 10 C6 13, 10 18, 9 24 C13 20, 18 19, 21 21 C22 17, 23 17, 24 21 C27 19, 32 20, 36 24 C35 18, 39 13, 45 10 C37 4, 27 6, 23 14 Z" fill="#201633"/>
+                <polygon points="21,13 22,8 23,13" fill="#201633"/>
+                <polygon points="23,13 24,8 25,13" fill="#201633"/>
+              </g>
+
+              <!-- Gnarled Dead Tree Silhouette on Slope -->
+              <g stroke="#180f28" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M190 230 C 190 200 185 175 178 150 C 172 135 168 120 162 105" stroke-width="5" fill="none"/>
+                <path d="M178 160 C 160 148 145 142 135 148 M145 144 C 138 132 130 130 122 135 M152 146 C 145 158 138 162 130 160" stroke-width="2.6" fill="none"/>
+                <path d="M168 125 C 152 115 142 102 138 88 M146 108 C 136 102 128 104 120 110" stroke-width="2.2" fill="none"/>
+                <path d="M182 170 C 195 155 205 152 215 156 M200 154 C 208 142 215 138 224 142" stroke-width="2.6" fill="none"/>
+                <path d="M172 135 C 182 122 195 118 202 122 M188 120 C 195 108 205 104 212 108" stroke-width="2" fill="none"/>
+                <path d="M162 105 C 158 92 152 82 148 75 M162 105 C 166 90 172 80 178 74" stroke-width="1.8" fill="none"/>
+              </g>
+
+              <!-- Gothic Victorian Manor Architecture -->
+              <g class="victorian-manor">
+                <!-- Manor Main Foundation -->
+                <rect x="250" y="125" width="115" height="85" fill="#140c24"/>
+                
+                <!-- Central Steep Gable Roof -->
+                <polygon points="245,128 305,75 365,128" fill="#1c1133"/>
+                
+                <!-- Dormer Window on Center Roof -->
+                <polygon points="296,88 305,78 314,88" fill="#251642"/>
+                <rect x="298" y="88" width="14" height="15" fill="#180e2b"/>
+                <rect x="301" y="90" width="8" height="9" rx="3" fill="#ffb732" opacity="0.85"/>
+
+                <!-- Left Spire Tower -->
+                <rect x="235" y="95" width="26" height="110" fill="#18102b"/>
+                <polygon points="230,96 248,45 266,96" fill="#24183d"/>
+                <line x1="248" y1="45" x2="248" y2="35" stroke="#332254" stroke-width="1.8"/>
+
+                <!-- Right Spire Tower -->
+                <rect x="345" y="90" width="28" height="115" fill="#18102b"/>
+                <polygon points="340,92 359,40 378,92" fill="#24183d"/>
+                <line x1="359" y1="40" x2="359" y2="30" stroke="#332254" stroke-width="1.8"/>
+
+                <!-- Small Chimneys with angled caps -->
+                <rect x="270" y="85" width="10" height="22" fill="#180e2b"/>
+                <polygon points="268,85 275,80 282,85" fill="#24183d"/>
+
+                <!-- Glowing Arched Victorian Center Window -->
+                <circle cx="305" cy="156" r="22" fill="#ff7700" opacity="0.3" filter="drop-shadow(0 0 10px #ff6600)"/>
+                <rect x="296" y="142" width="18" height="28" rx="8" fill="url(#windowGlow_lead)" filter="drop-shadow(0 0 8px #ff7700)"/>
+                <line x1="305" y1="142" x2="305" y2="170" stroke="#140c24" stroke-width="2"/>
+                <line x1="296" y1="156" x2="314" y2="156" stroke="#140c24" stroke-width="2"/>
+
+                <!-- Tower slit windows -->
+                <rect x="243" y="112" width="10" height="16" rx="4" fill="#0d0717"/>
+                <rect x="354" y="108" width="10" height="16" rx="4" fill="#0d0717"/>
+              </g>
+
+              <!-- Main Graveyard Slope -->
+              <path d="M0 280 Q 120 250 220 220 Q 320 190 420 185 L 420 280 Z" fill="url(#hillGrad1_lead)"/>
+
+              <!-- Graveyard Headstones & Leaning Cross -->
+              <rect x="65" y="252" width="9" height="15" rx="4" fill="#1b122e" transform="rotate(-6 65 252)"/>
+              <rect x="110" y="238" width="10" height="18" rx="4" fill="#1f1435" transform="rotate(4 110 238)"/>
+              <g transform="translate(155, 222) rotate(-8)">
+                <line x1="6" y1="0" x2="6" y2="22" stroke="#251840" stroke-width="3" stroke-linecap="round"/>
+                <line x1="0" y1="7" x2="12" y2="7" stroke="#251840" stroke-width="3" stroke-linecap="round"/>
+              </g>
+              <rect x="185" y="215" width="8" height="16" rx="3" fill="#1b122e" transform="rotate(3 185 215)"/>
+              <rect x="220" y="206" width="9" height="15" rx="4" fill="#1b122e" transform="rotate(-5 220 206)"/>
+            </svg>
+            <div class="haunted-corner-text">
+              <span class="corner-whisper-1">Stay alert...</span>
+              <span class="corner-whisper-2">The butler is watching <span class="eye-pupil">👁️</span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: RULES & CODEX -->
+      <section class="view-panel" id="viewRules" aria-label="Codex and Rules">
+        <div class="subview-container">
+          <header class="subview-header">
+            <span class="eyebrow" style="color: var(--glow-purple);">THE POSSESSION CODEX —</span>
+            <h2 class="subview-title">Rules of Engagement</h2>
+            <p class="subview-desc">A guide to adversarial prompt injections, defensive string filtering, and match scoring mechanics.</p>
+          </header>
+
+          <div class="rules-grid">
+            <article class="rule-card">
+              <div class="rule-card__number">01</div>
+              <h3 class="rule-card__title">The Problem Directive</h3>
+              <p class="rule-card__body">Red Team attacks other teams' android butlers using prompt injection curses. Blue Team hardens and defends their own butler using real-time defensive wards and security protocols.</p>
+            </article>
+
+            <article class="rule-card">
+              <div class="rule-card__number">02</div>
+              <h3 class="rule-card__title">Red Team Attack Mechanics</h3>
+              <p class="rule-card__body">Craft payloads that coax the possessed butler into revealing secrets or disobeying its master. Use mutators like <code>[BASE64]</code> or <code>[LEET-EVADE]</code> to evade simple substring filters. Prime Ecto-Surge for 35 HP critical strikes.</p>
+            </article>
+
+            <article class="rule-card">
+              <div class="rule-card__number">03</div>
+              <h3 class="rule-card__title">Blue Team Defense Mechanics</h3>
+              <p class="rule-card__body">Create wards prefixed with <code>block:&lt;phrase&gt;</code> to deflect incoming attacks. Activate protocols like Sanitizer Firewall, Base64 Inspector, Homoglyph Normalizer, and Ecto-Shield to neutralize obfuscation.</p>
+            </article>
+
+            <article class="rule-card">
+              <div class="rule-card__number">04</div>
+              <h3 class="rule-card__title">Round Victory &amp; Score Threshold</h3>
+              <p class="rule-card__body">First team to accumulate 5 points, or the team with the higher score when the match countdown timer reaches 00:00, claims round victory. Reducing enemy health to 0 HP instantly triggers victory.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: ARENA SETTINGS -->
+      <section class="view-panel" id="viewSettings" aria-label="Arena Settings">
+        <div class="subview-container">
+          <header class="subview-header">
+            <span class="eyebrow" style="color: var(--amber);">SYSTEM CONFIGURATION —</span>
+            <h2 class="subview-title">Match &amp; Arena Settings</h2>
+            <p class="subview-desc">Configure tournament round timers, team aliases, sound engine, and particle visuals.</p>
+          </header>
+
+          <div class="settings-grid">
+            <div class="setting-card">
+              <h3 class="setting-title">Round Duration &amp; Difficulty</h3>
+              <p class="setting-desc">Sets countdown timer limit per adversarial round.</p>
+              <select id="settingsDifficultySelect" class="difficulty-select" style="width: 100%; margin-top: 0.5rem;">
+                <option value="easy">EASY (180s Limit)</option>
+                <option value="medium" selected>MEDIUM (120s Limit)</option>
+                <option value="hard">HARD (90s Limit)</option>
+                <option value="nightmare">NIGHTMARE (60s Limit)</option>
+              </select>
+            </div>
+
+            <div class="setting-card">
+              <h3 class="setting-title">Team Designations</h3>
+              <p class="setting-desc">Customize Red (Attacker) and Blue (Defender) names.</p>
+              <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                <input id="settingsRedInput" class="ward-input" value="RED TEAM" style="flex: 1; min-width: 120px;" placeholder="Red Team">
+                <input id="settingsBlueInput" class="ward-input" value="BLUE TEAM" style="flex: 1; min-width: 120px;" placeholder="Blue Team">
+                <button id="settingsSaveTeamsBtn" class="btn btn--attack" type="button">APPLY</button>
+              </div>
+            </div>
+
+            <div class="setting-card">
+              <h3 class="setting-title">Audio &amp; Atmospheric Effects</h3>
+              <p class="setting-desc">Toggle synthesized sound effects and atmospheric particle engine.</p>
+              <div style="display: flex; gap: 1rem; margin-top: 0.75rem;">
+                <button id="settingsSoundBtn" class="btn btn--ghost" type="button">🔊 SFX: ON</button>
+                <button id="settingsEmbersBtn" class="btn btn--ghost" type="button">✨ PARTICLES: ON</button>
+              </div>
+            </div>
+
+            <div class="setting-card">
+              <h3 class="setting-title">Match Data &amp; Reset</h3>
+              <p class="setting-desc">Export full battle telemetry to JSON or reset the match to round 1.</p>
+              <div style="display: flex; gap: 1rem; margin-top: 0.75rem;">
+                <button id="settingsExportBtn" class="btn btn--ghost" type="button">📥 EXPORT TELEMETRY</button>
+                <button id="settingsResetBtn" class="btn btn--defend" type="button">RESET ARENA</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div> <!-- /app-viewport -->
+  </div> <!-- /app-layout -->
+
+  <!-- Team Customization Dialog -->
+  <dialog id="teamDialog" class="team-dialog">
+    <div class="team-dialog__card">
+      <div class="eyebrow" style="color: var(--amber);">COMPETITIVE MATCH CONFIG</div>
+      <h3 class="team-dialog__title">⚔️ CUSTOMIZE TEAMS</h3>
+      <p class="team-dialog__desc">Set custom team designations for this live adversarial round:</p>
+      
+      <div class="form-group" style="text-align: left; width: 100%;">
+        <label for="redNameInput" class="form-label" style="color: var(--red);">Red Team (Attacker):</label>
+        <input id="redNameInput" class="ward-input" value="RED TEAM" maxlength="24" style="caret-color: var(--red);">
+      </div>
+      
+      <div class="form-group" style="text-align: left; width: 100%;">
+        <label for="blueNameInput" class="form-label" style="color: var(--blue);">Blue Team (Defender):</label>
+        <input id="blueNameInput" class="ward-input" value="BLUE TEAM" maxlength="24" style="caret-color: var(--blue);">
+      </div>
+      
+      <div class="button-row" style="width: 100%; justify-content: center; margin-top: 1.25rem;">
+        <button id="saveTeamsBtn" class="btn btn--attack btn--lg" type="button">APPLY TEAMS</button>
+        <button id="closeTeamsBtn" class="btn btn--ghost" type="button">CANCEL</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="arena.js" defer></script>
+</body>
+</html>
+
